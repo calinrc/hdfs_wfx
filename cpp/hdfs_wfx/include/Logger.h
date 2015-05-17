@@ -39,6 +39,6 @@ private:
     static Logger* s_instance;
 };
 
-#define LOGGING(__MSG__, ...) {  Logger::getInstance()->init(false, true); Logger::getInstance()->log(__MSG__, ##__VA_ARGS__); }
+#define LOGGING(__MSG__, ...) {  Logger::getInstance()->log(__MSG__, ##__VA_ARGS__); }
 
 #endif /* INCLUDE_LOGGER_H_ */

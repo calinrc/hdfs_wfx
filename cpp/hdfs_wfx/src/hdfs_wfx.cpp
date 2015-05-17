@@ -41,6 +41,7 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
     gLogProc = pLogProc;
     gRequestProc = pRequestProc;
     gPluginNumber = PluginNr;
+    Logger::getInstance()->init(false, true);
     LOGGING("FSInit");
     JVMState::instance()->initialize(CLASS_PATH);
 
@@ -134,6 +135,7 @@ void FsSetDefaultParams(FsDefaultParamStruct* dps)
 
 void FsGetDefRootName(char* DefRootName, int maxlen)
 {
+    Logger::getInstance()->init(false, true);
     LOGGING("FsGetDefRootName");
     strncpy(DefRootName, "HDFS", maxlen);
 }
