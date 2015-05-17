@@ -1,5 +1,12 @@
 #include "common.h"
 
+#ifndef WFX_PLUGIN_H
+#define WFX_PLUGIN_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // contents of fsplugin.h  version 2.0 (30.Jan.2009)
 
 // ids for FsGetFile
@@ -37,8 +44,6 @@
 #define FS_COPYFLAGS_EXISTS_SAMECASE 8
 
 #define FS_COPYFLAGS_EXISTS_DIFFERENTCASE 16
-
- 
 
 // flags for tRequestProc
 
@@ -166,94 +171,85 @@
 
 #define FILE_ATTRIBUTE_UNIX_MODE 0x80000000
 
-typedef struct {
 
-    DWORD SizeLow,SizeHigh;
+    typedef struct
+    {
 
-    FILETIME LastWriteTime;
+        DWORD SizeLow, SizeHigh;
 
-    int Attr;
+        FILETIME LastWriteTime;
 
-} RemoteInfoStruct;
+        int Attr;
 
-typedef struct {
+    } RemoteInfoStruct;
 
-int size;
-	DWORD PluginInterfaceVersionLow;
-	DWORD PluginInterfaceVersionHi;
-	char DefaultIniName[MAX_PATH];
-} FsDefaultParamStruct;
+    typedef struct
+    {
+
+        int size;
+        DWORD PluginInterfaceVersionLow;
+        DWORD PluginInterfaceVersionHi;
+        char DefaultIniName[MAX_PATH];
+    } FsDefaultParamStruct;
 
 // callback functions
-typedef int (DCPCALL *tProgressProc)(int PluginNr,char* SourceName,
-             char* TargetName,int PercentDone);
-typedef int (DCPCALL *tProgressProcW)(int PluginNr,WCHAR* SourceName,
-             WCHAR* TargetName,int PercentDone);
-typedef void (DCPCALL *tLogProc)(int PluginNr,int MsgType,char* LogString);
-typedef void (DCPCALL *tLogProcW)(int PluginNr,int MsgType,WCHAR* LogString);
+    typedef int (DCPCALL *tProgressProc)(int PluginNr, char* SourceName, char* TargetName, int PercentDone);
+    typedef int (DCPCALL *tProgressProcW)(int PluginNr, WCHAR* SourceName, WCHAR* TargetName, int PercentDone);
+    typedef void (DCPCALL *tLogProc)(int PluginNr, int MsgType, char* LogString);
+    typedef void (DCPCALL *tLogProcW)(int PluginNr, int MsgType, WCHAR* LogString);
 
-typedef BOOL (DCPCALL *tRequestProc)(int PluginNr,int RequestType,char* CustomTitle,
-              char* CustomText,char* ReturnedText,int maxlen);
-typedef BOOL (DCPCALL *tRequestProcW)(int PluginNr,int RequestType,WCHAR* CustomTitle,
-              WCHAR* CustomText,WCHAR* ReturnedText,int maxlen);
-typedef int (DCPCALL *tCryptProc)(int PluginNr,int CryptoNr,int Mode,
-			  char* ConnectionName,char* Password,int maxlen);
-typedef int (DCPCALL *tCryptProcW)(int PluginNr,int CryptoNr,int Mode,
-			  WCHAR* ConnectionName,WCHAR* Password,int maxlen);
+    typedef BOOL (DCPCALL *tRequestProc)(int PluginNr, int RequestType, char* CustomTitle, char* CustomText, char* ReturnedText, int maxlen);
+    typedef BOOL (DCPCALL *tRequestProcW)(int PluginNr, int RequestType, WCHAR* CustomTitle, WCHAR* CustomText, WCHAR* ReturnedText, int maxlen);
+    typedef int (DCPCALL *tCryptProc)(int PluginNr, int CryptoNr, int Mode, char* ConnectionName, char* Password, int maxlen);
+    typedef int (DCPCALL *tCryptProcW)(int PluginNr, int CryptoNr, int Mode, WCHAR* ConnectionName, WCHAR* Password, int maxlen);
 
 // Function prototypes
-int DCPCALL FsInit(int PluginNr,tProgressProc pProgressProc,
-                     tLogProc pLogProc,tRequestProc pRequestProc);
-int DCPCALL FsInitW(int PluginNr,tProgressProcW pProgressProcW,
-                     tLogProcW pLogProcW,tRequestProcW pRequestProcW);
-void DCPCALL FsSetCryptCallback(tCryptProc pCryptProc,int CryptoNr,int Flags);
-void DCPCALL FsSetCryptCallbackW(tCryptProcW pCryptProcW,int CryptoNr,int Flags);
-HANDLE DCPCALL FsFindFirst(char* Path,WIN32_FIND_DATAA *FindData);
-HANDLE DCPCALL FsFindFirstW(WCHAR* Path,WIN32_FIND_DATAW *FindData);
+    int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc);
+    int DCPCALL FsInitW(int PluginNr, tProgressProcW pProgressProcW, tLogProcW pLogProcW, tRequestProcW pRequestProcW);
+    void DCPCALL FsSetCryptCallback(tCryptProc pCryptProc, int CryptoNr, int Flags);
+    void DCPCALL FsSetCryptCallbackW(tCryptProcW pCryptProcW, int CryptoNr, int Flags);
+    HANDLE DCPCALL FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData);
+    HANDLE DCPCALL FsFindFirstW(WCHAR* Path, WIN32_FIND_DATAW *FindData);
 
-BOOL DCPCALL FsFindNext(HANDLE Hdl,WIN32_FIND_DATAA *FindData);
-BOOL DCPCALL FsFindNextW(HANDLE Hdl,WIN32_FIND_DATAW *FindData);
-int DCPCALL FsFindClose(HANDLE Hdl);
-BOOL DCPCALL FsMkDir(char* Path);
-BOOL DCPCALL FsMkDirW(WCHAR* Path);
-int DCPCALL FsExecuteFile(HWND MainWin,char* RemoteName,char* Verb);
-int DCPCALL FsExecuteFileW(HWND MainWin,WCHAR* RemoteName,WCHAR* Verb);
-int DCPCALL FsRenMovFile(char* OldName,char* NewName,BOOL Move,
-                           BOOL OverWrite,RemoteInfoStruct* ri);
-int DCPCALL FsRenMovFileW(WCHAR* OldName,WCHAR* NewName,BOOL Move,
-                           BOOL OverWrite,RemoteInfoStruct* ri);
-int DCPCALL FsGetFile(char* RemoteName,char* LocalName,int CopyFlags,
-                        RemoteInfoStruct* ri);
+    BOOL DCPCALL FsFindNext(HANDLE Hdl, WIN32_FIND_DATAA *FindData);
+    BOOL DCPCALL FsFindNextW(HANDLE Hdl, WIN32_FIND_DATAW *FindData);
+    int DCPCALL FsFindClose(HANDLE Hdl);
+    BOOL DCPCALL FsMkDir(char* Path);
+    BOOL DCPCALL FsMkDirW(WCHAR* Path);
+    int DCPCALL FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb);
+    int DCPCALL FsExecuteFileW(HWND MainWin, WCHAR* RemoteName, WCHAR* Verb);
+    int DCPCALL FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri);
+    int DCPCALL FsRenMovFileW(WCHAR* OldName, WCHAR* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri);
+    int DCPCALL FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri);
 
-int DCPCALL FsGetFileW(WCHAR* RemoteName,WCHAR* LocalName,int CopyFlags,
-                        RemoteInfoStruct* ri);
-int DCPCALL FsPutFile(char* LocalName,char* RemoteName,int CopyFlags);
-int DCPCALL FsPutFileW(WCHAR* LocalName,WCHAR* RemoteName,int CopyFlags);
-BOOL DCPCALL FsDeleteFile(char* RemoteName);
-BOOL DCPCALL FsDeleteFileW(WCHAR* RemoteName);
-BOOL DCPCALL FsRemoveDir(char* RemoteName);
-BOOL DCPCALL FsRemoveDirW(WCHAR* RemoteName);
-BOOL DCPCALL FsDisconnect(char* DisconnectRoot);
-BOOL DCPCALL FsDisconnectW(WCHAR* DisconnectRoot);
-BOOL DCPCALL FsSetAttr(char* RemoteName,int NewAttr);
-BOOL DCPCALL FsSetAttrW(WCHAR* RemoteName,int NewAttr);
-BOOL DCPCALL FsSetTime(char* RemoteName,FILETIME *CreationTime,
+    int DCPCALL FsGetFileW(WCHAR* RemoteName, WCHAR* LocalName, int CopyFlags, RemoteInfoStruct* ri);
+    int DCPCALL FsPutFile(char* LocalName, char* RemoteName, int CopyFlags);
+    int DCPCALL FsPutFileW(WCHAR* LocalName, WCHAR* RemoteName, int CopyFlags);
+    BOOL DCPCALL FsDeleteFile(char* RemoteName);
+    BOOL DCPCALL FsDeleteFileW(WCHAR* RemoteName);
+    BOOL DCPCALL FsRemoveDir(char* RemoteName);
+    BOOL DCPCALL FsRemoveDirW(WCHAR* RemoteName);
+    BOOL DCPCALL FsDisconnect(char* DisconnectRoot);
+    BOOL DCPCALL FsDisconnectW(WCHAR* DisconnectRoot);
+    BOOL DCPCALL FsSetAttr(char* RemoteName, int NewAttr);
+    BOOL DCPCALL FsSetAttrW(WCHAR* RemoteName, int NewAttr);
+    BOOL DCPCALL FsSetTime(char* RemoteName, FILETIME *CreationTime,
 
-      FILETIME *LastAccessTime,FILETIME *LastWriteTime);
-BOOL DCPCALL FsSetTimeW(WCHAR* RemoteName,FILETIME *CreationTime,
-      FILETIME *LastAccessTime,FILETIME *LastWriteTime);
-void DCPCALL FsStatusInfo(char* RemoteDir,int InfoStartEnd,int InfoOperation);
-void DCPCALL FsStatusInfoW(WCHAR* RemoteDir,int InfoStartEnd,int InfoOperation);
-void DCPCALL FsGetDefRootName(char* DefRootName,int maxlen);
-int DCPCALL FsExtractCustomIcon(char* RemoteName,int ExtractFlags,HICON* TheIcon);
-int DCPCALL FsExtractCustomIconW(WCHAR* RemoteName,int ExtractFlags,HICON* TheIcon);
-void DCPCALL FsSetDefaultParams(FsDefaultParamStruct* dps);
+    FILETIME *LastAccessTime,
+                           FILETIME *LastWriteTime);
+    BOOL DCPCALL FsSetTimeW(WCHAR* RemoteName, FILETIME *CreationTime, FILETIME *LastAccessTime, FILETIME *LastWriteTime);
+    void DCPCALL FsStatusInfo(char* RemoteDir, int InfoStartEnd, int InfoOperation);
+    void DCPCALL FsStatusInfoW(WCHAR* RemoteDir, int InfoStartEnd, int InfoOperation);
+    void DCPCALL FsGetDefRootName(char* DefRootName, int maxlen);
+    int DCPCALL FsExtractCustomIcon(char* RemoteName, int ExtractFlags, HICON* TheIcon);
+    int DCPCALL FsExtractCustomIconW(WCHAR* RemoteName, int ExtractFlags, HICON* TheIcon);
+    void DCPCALL FsSetDefaultParams(FsDefaultParamStruct* dps);
 
-int DCPCALL FsGetPreviewBitmap(char* RemoteName,int width,int height,HBITMAP* ReturnedBitmap);
-int DCPCALL FsGetPreviewBitmapW(WCHAR* RemoteName,int width,int height,HBITMAP* ReturnedBitmap);
-BOOL DCPCALL FsLinksToLocalFiles(void);
-BOOL DCPCALL FsGetLocalName(char* RemoteName,int maxlen);
-BOOL DCPCALL FsGetLocalNameW(WCHAR* RemoteName,int maxlen);
+    int DCPCALL FsGetPreviewBitmap(char* RemoteName, int width, int height, HBITMAP* ReturnedBitmap);
+    int DCPCALL FsGetPreviewBitmapW(WCHAR* RemoteName, int width, int height, HBITMAP* ReturnedBitmap);
+    BOOL DCPCALL FsLinksToLocalFiles(void);
+    BOOL DCPCALL FsGetLocalName(char* RemoteName, int maxlen);
+    BOOL DCPCALL FsGetLocalNameW(WCHAR* RemoteName, int maxlen);
 
 // ************************** content plugin extension ****************************
 
@@ -299,40 +295,46 @@ BOOL DCPCALL FsGetLocalNameW(WCHAR* RemoteName,int maxlen);
 #define setflags_last_attribute  2     // Last attribute of this file
 #define setflags_only_date       4     // Only set the date of the datetime value!
 
-
 #define CONTENT_DELAYIFSLOW 1  // ContentGetValue called in foreground
 
-typedef struct {
-    int size;
-    DWORD PluginInterfaceVersionLow;
-    DWORD PluginInterfaceVersionHi;
+    typedef struct
+    {
+        int size;
+        DWORD PluginInterfaceVersionLow;
+        DWORD PluginInterfaceVersionHi;
 
-    char DefaultIniName[MAX_PATH];
-} ContentDefaultParamStruct;
+        char DefaultIniName[MAX_PATH];
+    } ContentDefaultParamStruct;
 
-typedef struct {
-	WORD wYear;
-	WORD wMonth;
-	WORD wDay;
-} tdateformat,*pdateformat;
+    typedef struct
+    {
+        WORD wYear;
+        WORD wMonth;
+        WORD wDay;
+    } tdateformat, *pdateformat;
 
-typedef struct {
-	WORD wHour;
-	WORD wMinute;
-	WORD wSecond;
-} ttimeformat,*ptimeformat;
+    typedef struct
+    {
+        WORD wHour;
+        WORD wMinute;
+        WORD wSecond;
+    } ttimeformat, *ptimeformat;
 
-int DCPCALL FsContentGetSupportedField(int FieldIndex,char* FieldName,char* Units,int maxlen);
-int DCPCALL FsContentGetValue(char* FileName,int FieldIndex,int UnitIndex,void* FieldValue,int maxlen,int flags);
-int DCPCALL FsContentGetValueW(WCHAR* FileName,int FieldIndex,int UnitIndex,void* FieldValue,int maxlen,int flags);
+    int DCPCALL FsContentGetSupportedField(int FieldIndex, char* FieldName, char* Units, int maxlen);
+    int DCPCALL FsContentGetValue(char* FileName, int FieldIndex, int UnitIndex, void* FieldValue, int maxlen, int flags);
+    int DCPCALL FsContentGetValueW(WCHAR* FileName, int FieldIndex, int UnitIndex, void* FieldValue, int maxlen, int flags);
 
-void DCPCALL FsContentStopGetValue(char* FileName);
-void DCPCALL FsContentStopGetValueW(WCHAR* FileName);
-int DCPCALL FsContentGetDefaultSortOrder(int FieldIndex);
-void DCPCALL FsContentPluginUnloading(void);
-int DCPCALL FsContentGetSupportedFieldFlags(int FieldIndex);
-int DCPCALL FsContentSetValue(char* FileName,int FieldIndex,int UnitIndex,int FieldType,void* FieldValue,int flags);
-int DCPCALL FsContentSetValueW(WCHAR* FileName,int FieldIndex,int UnitIndex,int FieldType,void* FieldValue,int flags);
+    void DCPCALL FsContentStopGetValue(char* FileName);
+    void DCPCALL FsContentStopGetValueW(WCHAR* FileName);
+    int DCPCALL FsContentGetDefaultSortOrder(int FieldIndex);
+    void DCPCALL FsContentPluginUnloading(void);
+    int DCPCALL FsContentGetSupportedFieldFlags(int FieldIndex);
+    int DCPCALL FsContentSetValue(char* FileName, int FieldIndex, int UnitIndex, int FieldType, void* FieldValue, int flags);
+    int DCPCALL FsContentSetValueW(WCHAR* FileName, int FieldIndex, int UnitIndex, int FieldType, void* FieldValue, int flags);
 
-BOOL DCPCALL FsContentGetDefaultView(char* ViewContents,char* ViewHeaders,char* ViewWidths,char* ViewOptions,int maxlen);
-BOOL DCPCALL FsContentGetDefaultViewW(WCHAR* ViewContents,WCHAR* ViewHeaders,WCHAR* ViewWidths,WCHAR* ViewOptions,int maxlen);
+    BOOL DCPCALL FsContentGetDefaultView(char* ViewContents, char* ViewHeaders, char* ViewWidths, char* ViewOptions, int maxlen);
+    BOOL DCPCALL FsContentGetDefaultViewW(WCHAR* ViewContents, WCHAR* ViewHeaders, WCHAR* ViewWidths, WCHAR* ViewOptions, int maxlen);
+#ifdef __cplusplus
+}
+#endif
+#endif //WFX_PLUGIN_H

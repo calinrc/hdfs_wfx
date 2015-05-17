@@ -25,11 +25,16 @@
 
 #include "wfxplugin.h"
 #include <stddef.h>
+#include <string.h>
+#include "JVMState.h"
+#include "gendef.h"
+
 
 int gPluginNumber;
 tProgressProc gProgressProc;
 tLogProc gLogProc;
 tRequestProc gRequestProc;
+JVMState jvmState;
 
 int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
@@ -37,6 +42,8 @@ int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc,
     gLogProc = pLogProc;
     gRequestProc = pRequestProc;
     gPluginNumber = PluginNr;
+
+    jvmState.initialize(CLASS_PATH);
 
     return 0;
 }
@@ -99,6 +106,7 @@ BOOL DCPCALL FsSetTime(char* RemoteName, FILETIME *CreationTime, FILETIME *LastA
 
 BOOL DCPCALL FsDisconnect(char *DisconnectRoot)
 {
+    jvmState.detach();
     return 0;
 }
 
@@ -108,5 +116,5 @@ void DCPCALL FsSetDefaultParams(FsDefaultParamStruct* dps)
 
 void DCPCALL FsGetDefRootName(char* DefRootName, int maxlen)
 {
-
+    strncpy(DefRootName, "HDFS", maxlen);
 }
