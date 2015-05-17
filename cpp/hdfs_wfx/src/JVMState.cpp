@@ -12,6 +12,8 @@
 
 #include "JVMState.h"
 
+JVMState* JVMState::s_instance = new JVMState();
+
 JVMState::JVMState()
 {
 
@@ -29,3 +31,8 @@ void JVMState::detach(){
 
 }
 
+
+
+JVMState* JVMState::instance(){
+    return s_instance;
+}

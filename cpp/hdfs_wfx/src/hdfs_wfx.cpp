@@ -28,93 +28,112 @@
 #include <string.h>
 #include "JVMState.h"
 #include "gendef.h"
-
+#include "Logger.h"
 
 int gPluginNumber;
 tProgressProc gProgressProc;
 tLogProc gLogProc;
 tRequestProc gRequestProc;
-JVMState jvmState;
 
-int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
+int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
     gProgressProc = pProgressProc;
     gLogProc = pLogProc;
     gRequestProc = pRequestProc;
     gPluginNumber = PluginNr;
-
-    jvmState.initialize(CLASS_PATH);
+    LOGGING("FSInit");
+    JVMState::instance()->initialize(CLASS_PATH);
 
     return 0;
 }
 
-HANDLE DCPCALL FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
+HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 {
+    LOGGING("FsFindFirst");
     HANDLE handle = NULL;
     return handle;
 }
 
-BOOL DCPCALL FsFindNext(HANDLE Hdl, WIN32_FIND_DATAA *FindData)
+BOOL FsFindNext(HANDLE Hdl, WIN32_FIND_DATAA *FindData)
 {
+    LOGGING("FsFindNext");
     return 0;
 }
 
-int DCPCALL FsFindClose(HANDLE Hdl)
+int FsFindClose(HANDLE Hdl)
 {
+    LOGGING("FsFindClose");
+    if (Hdl != NULL)
+    {
+        //delete Hdl;
+        Hdl = NULL;
+    }
+
     return FS_FILE_OK;
 }
 
-BOOL DCPCALL FsMkDir(char* Path)
+BOOL FsMkDir(char* Path)
 {
+    LOGGING("FsMkDir");
     return 0;
 }
 
-BOOL DCPCALL FsRemoveDir(char* RemoteName)
+BOOL FsRemoveDir(char* RemoteName)
 {
+    LOGGING("FsRemoveDir");
     return 0;
 }
 
-int DCPCALL FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri)
+int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri)
 {
+    LOGGING("FsRenMovFile");
     return -1;
 }
 
-int DCPCALL FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)
+int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)
 {
+    LOGGING("FsGetFile");
     return -1;
 }
 
-int DCPCALL FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
+int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
+    LOGGING("FsPutFile");
     return -1;
 }
 
-int DCPCALL FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
+int FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
 {
+    LOGGING("FsExecuteFile");
     return -1;
 }
 
-BOOL DCPCALL FsDeleteFile(char* RemoteName)
+BOOL FsDeleteFile(char* RemoteName)
 {
+    LOGGING("FsDeleteFile");
     return 0;
 }
 
-BOOL DCPCALL FsSetTime(char* RemoteName, FILETIME *CreationTime, FILETIME *LastAccessTime, FILETIME *LastWriteTime)
+BOOL FsSetTime(char* RemoteName, FILETIME *CreationTime, FILETIME *LastAccessTime, FILETIME *LastWriteTime)
 {
+    LOGGING("FsSetTime");
     return 0;
 }
 
-BOOL DCPCALL FsDisconnect(char *DisconnectRoot)
+BOOL FsDisconnect(char *DisconnectRoot)
 {
-    jvmState.detach();
+    LOGGING("FsDisconnect");
+    JVMState::instance()->detach();
     return 0;
 }
 
-void DCPCALL FsSetDefaultParams(FsDefaultParamStruct* dps)
+void FsSetDefaultParams(FsDefaultParamStruct* dps)
 {
+    LOGGING("FsSetDefaultParams");
 }
 
-void DCPCALL FsGetDefRootName(char* DefRootName, int maxlen)
+void FsGetDefRootName(char* DefRootName, int maxlen)
 {
+    LOGGING("FsGetDefRootName");
     strncpy(DefRootName, "HDFS", maxlen);
 }

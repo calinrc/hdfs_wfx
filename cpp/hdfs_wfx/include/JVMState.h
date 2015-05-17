@@ -18,11 +18,17 @@
 class JVMState
 {
 public:
-    JVMState();
-    virtual ~JVMState();
 
     void initialize(const char* javaclasspath);
     void detach();
+    static JVMState* instance();
+
+
+private:
+    JVMState();
+    virtual ~JVMState();
+
+    static JVMState* s_instance;
 
 
 };

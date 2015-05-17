@@ -4,8 +4,10 @@
 
 #if defined(__WIN32__) || defined(_WIN32) || defined(_WIN64)
   #define DCPCALL __attribute__((stdcall))
-#else
+#elif not defined (LINUX)
   #define DCPCALL __attribute__((cdecl))
+#else
+  #define DCPCALL
 #endif
 
 #define MAX_PATH 260
@@ -59,8 +61,10 @@ typedef struct _WIN32_FIND_DATAW {
 
 #if defined(_WIN32) || defined(_WIN64)
   #define DCPCALL __stdcall
-#else
+#elif not defined (LINUX)
   #define DCPCALL __cdecl
+#else
+  #define DCPCALL
 #endif
 
 #endif
