@@ -29,6 +29,8 @@ private:
     virtual ~JVMState();
 
     static JVMState* s_instance;
+    bool m_initialized;
+
 
 
 };
