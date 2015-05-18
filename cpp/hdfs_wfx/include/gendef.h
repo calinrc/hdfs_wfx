@@ -15,7 +15,8 @@
 
 #define CLASS_PATH "~/work/workspace-cpp/hdfs_wfx_java/target/classes"
 
-#define LOG_FILE "/home/abs/.config/doublecmd/plugins/hdfs_wfx/logs/hdfs_wfx.log"
+#define LOG_FILE ".config/doublecmd/plugins/hdfs_wfx/logs/hdfs_wfx.log"
+#define MAX_PATH 265
 
 
 #endif /* INCLUDE_GENDEF_H_ */

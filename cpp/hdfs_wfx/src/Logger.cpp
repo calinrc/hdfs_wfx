@@ -16,6 +16,10 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include <unistd.h>
+#include <stdlib.h>
+#include <pwd.h>
+
 Logger* Logger::s_instance = new Logger();
 
 Logger::Logger() :
@@ -38,7 +42,14 @@ void Logger::init(bool consoleEnable, bool fileEnable)
     this->m_isFileLoggingEnabled = fileEnable;
     if (m_isFileLoggingEnabled)
     {
-        m_file = fopen(LOG_FILE, "a");
+        const char *homedir;
+
+        if ((homedir = getenv("HOME")) == NULL) {
+            homedir = getpwuid(getuid())->pw_dir;
+        }
+        char logPath[MAX_PATH];
+        sprintf(logPath, "%s/%s", homedir, LOG_FILE);
+        m_file = fopen(logPath, "a");
     }
 }
 

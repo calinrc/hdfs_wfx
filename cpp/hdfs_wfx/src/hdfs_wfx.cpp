@@ -7,13 +7,14 @@
  *   WFX plugin for working with HDFS
  *
  *   Based on:
- *     GVFS plugin for Tux Commander
- *     Copyright (C) 2008-2009 Tomas Bzatek <tbzatek@users.sourceforge.net>*
+ *     GVFS plugin for Double Commander
+ *     Copyright (C) 2009-2010  Koblov Alexander (Alexx2000@mail.ru)
  *
  *     and
  *
- *     GVFS plugin for Double cOMMANDER
- *     Copyright (C) 2009-2010  Koblov Alexander (Alexx2000@mail.ru)
+ *     GVFS plugin for Tux Commander
+ *     Copyright (C) 2008-2009 Tomas Bzatek <tbzatek@users.sourceforge.net>*
+ *
  *
  * This work is free: you can redistribute it and/or modify it under the terms of GPL License Version 2.0
  *
