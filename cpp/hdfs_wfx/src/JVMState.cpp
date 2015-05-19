@@ -13,11 +13,14 @@
 #include "JVMState.h"
 #include <jni.h>
 #include "Logger.h"
+#include <stdlib.h>
+#include <dlfcn.h>
+#include <sys/stat.h>
 
 JVMState* JVMState::s_instance = new JVMState();
 
 JVMState::JVMState() :
-        m_initialized(false)
+        m_initialized(false), m_handle(NULL), m_jvm(NULL)
 {
 
 }
@@ -26,41 +29,105 @@ JVMState::~JVMState()
 {
 }
 
-void JVMState::initialize(const char* javaclasspath)
+JVMStateEnum JVMState::initialize(const char* javaclasspath)
 {
 
+    JVMStateEnum retVal = JVMLoadFail;
     if (!m_initialized)
     {
         LOGGING("Start creating JVM");
 
-        JavaVM *jvm; /* denotes a Java VM */
         JNIEnv *env; /* pointer to native method interface */
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
         JavaVMOption* options = new JavaVMOption[1];
-        options[0].optionString = "-Djava.class.path=/usr/lib/java";
+        options[0].optionString =(const char* ) "-Djava.class.path=/usr/lib/java";
         vm_args.version = JNI_VERSION_1_6;
         vm_args.nOptions = 1;
         vm_args.options = options;
         vm_args.ignoreUnrecognized = false;
         /* load and initialize a Java VM, return a JNI interface
          * pointer in env */
-        JNI_CreateJavaVM(&jvm, (void**) &env, &vm_args);
+
+        char* javaHomeFolder = getenv("JAVA_HOME");
+        if (javaHomeFolder != NULL)
+        {
+            char path[MAX_PATH] = { 0 };
+
+            sprintf(path, "%s/jre/lib/amd64/server/libjvm.so", javaHomeFolder);
+
+            bool foundJvm = false;
+
+            struct stat st = { 0 };
+
+            if (stat(path, &st) == -1)
+            {
+                LOGGING("Unable to find jvm dynamic library in %s", path);
+                sprintf(path, "%s/jre/lib/amd64/default/libjvm.so", javaHomeFolder);
+                if (stat(path, &st) == -1)
+                {
+                    LOGGING("Unable to find jvm dynamic library in %s", path);
+                } else
+                {
+                    foundJvm = true;
+                }
+
+            } else
+            {
+                //found in default Oracle, OpenJDK places
+                foundJvm = true;
+            }
+            if (foundJvm)
+            {
+                m_handle = dlopen(path, RTLD_LAZY);
+
+                if (m_handle != NULL)
+                {
+                    //jint (*JNI_CreateJavaVM)(MyClass*);
+
+                    jint (*JNI_CreateJavaVM_loc)(JavaVM **, void **, void *);
+
+                    JNI_CreateJavaVM_loc = (jint (*)(JavaVM **, void **, void *))dlsym(m_handle, "JNI_CreateJavaVM");
+
+JNI_CreateJavaVM_loc                    (&m_jvm, (void**) &env, &vm_args);
+
+                    LOGGING("Destroy created JVM");
+                    retVal = JVMLoaded;
+                }
+            }
+
+        } else
+        {
+            LOGGING("Unable to find JAVA_HOME variable");
+        }
+
         delete options;
+
         /* invoke the Main.test method using the JNI */
 
         //jclass cls = env->FindClass("Main");
         //jmethodID mid = env->GetStaticMethodID(cls, "test", "(I)V");
         //env->CallStaticVoidMethod(cls, mid, 100);
         /* We are done. */
-        LOGGING("Destroy created JVM");
-        jvm->DestroyJavaVM();
     }
+    return retVal;
 
 }
 
-void JVMState::detach()
+JVMStateEnum JVMState::detach()
 {
-
+    JVMStateEnum retVal = JVMDetached;
+    if (m_jvm != NULL)
+    {
+        m_jvm->DestroyJavaVM();
+        m_jvm = NULL;
+    }
+    if (m_handle != NULL)
+    {
+        dlclose(m_handle);
+        m_handle = NULL;
+    }
+    m_initialized = false;
+    return retVal;
 }
 
 JVMState* JVMState::instance()

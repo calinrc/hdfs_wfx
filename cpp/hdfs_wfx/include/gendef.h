@@ -24,4 +24,13 @@
 #define FULL_LOG_PATH LOG_PATH LOG_FILE_NAME
 #define MAX_PATH 260
 
+
+enum JVMStateEnum {
+
+    JVMLoaded,
+    JVMLoadFail,
+    JVMDetached,
+    JVMDetachFail
+}
+
 #endif /* INCLUDE_GENDEF_H_ */

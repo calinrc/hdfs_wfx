@@ -14,13 +14,14 @@
 #define JVMSTATE_H_
 
 #include <jni.h>
+#include "gendef.h"
 
 class JVMState
 {
 public:
 
-    void initialize(const char* javaclasspath);
-    void detach();
+    JVMStateEnum initialize(const char* javaclasspath);
+    JVMStateEnum detach();
     static JVMState* instance();
 
 
@@ -30,8 +31,8 @@ private:
 
     static JVMState* s_instance;
     bool m_initialized;
-
-
+    void* m_handle;
+    JavaVM* m_jvm;
 
 };
 
