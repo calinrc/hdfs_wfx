@@ -44,7 +44,7 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
     gPluginNumber = PluginNr;
     Logger::getInstance()->init(false, true);
     LOGGING("FSInit");
-    JVMState::instance()->initialize(CLASS_PATH);
+    JVMState::instance()->initialize(JAVA_CLASSPATH_VAL);
 
     return 0;
 }
@@ -67,7 +67,7 @@ int FsFindClose(HANDLE Hdl)
     LOGGING("FsFindClose");
     if (Hdl != NULL)
     {
-        //delete Hdl;
+        delete Hdl;
         Hdl = NULL;
     }
 

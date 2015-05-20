@@ -17,6 +17,8 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 
+typedef jint (*JNI_CreateJavaVM_func)(JavaVM **, void **, void *);
+
 JVMState* JVMState::s_instance = new JVMState();
 
 JVMState::JVMState() :
@@ -40,7 +42,10 @@ JVMStateEnum JVMState::initialize(const char* javaclasspath)
         JNIEnv *env; /* pointer to native method interface */
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
         JavaVMOption* options = new JavaVMOption[1];
-        options[0].optionString =(const char* ) "-Djava.class.path=/usr/lib/java";
+
+        char classpath[2048];
+        sprintf(classpath, "%s%s", JAVA_CLASSPATH_KEY, javaclasspath);
+        options[0].optionString = classpath;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.nOptions = 1;
         vm_args.options = options;
@@ -82,13 +87,16 @@ JVMStateEnum JVMState::initialize(const char* javaclasspath)
 
                 if (m_handle != NULL)
                 {
-                    //jint (*JNI_CreateJavaVM)(MyClass*);
 
-                    jint (*JNI_CreateJavaVM_loc)(JavaVM **, void **, void *);
-
+                    JNI_CreateJavaVM_func JNI_CreateJavaVM_loc;
                     JNI_CreateJavaVM_loc = (jint (*)(JavaVM **, void **, void *))dlsym(m_handle, "JNI_CreateJavaVM");
 
-JNI_CreateJavaVM_loc                    (&m_jvm, (void**) &env, &vm_args);
+jint                    jvmCreateState = JNI_CreateJavaVM_loc(&m_jvm, (void**) &env, &vm_args);
+
+                    if (jvmCreateState == JNI_OK)
+                    {
+
+                    }
 
                     LOGGING("Destroy created JVM");
                     retVal = JVMLoaded;

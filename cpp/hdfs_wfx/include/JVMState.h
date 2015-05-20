@@ -33,7 +33,6 @@ private:
     bool m_initialized;
     void* m_handle;
     JavaVM* m_jvm;
-
 };
 
 #endif /* JVMSTATE_H_ */

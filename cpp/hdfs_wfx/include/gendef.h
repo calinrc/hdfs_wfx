@@ -13,13 +13,15 @@
 #ifndef INCLUDE_GENDEF_H_
 #define INCLUDE_GENDEF_H_
 
-#define CLASS_PATH "~/work/workspace-cpp/hdfs_wfx_java/target/classes"
-
 #define PLUGINS_LOCATION ".config/doublecmd/plugins"
 
 #define PLUGIN_LOCATION PLUGINS_LOCATION "/hdfs_wfx"
 #define LOG_PATH PLUGIN_LOCATION "/logs"
 #define LOG_FILE_NAME "/hdfs_wfx.log"
+
+#define JAVA_CLASSPATH_KEY "-Djava.class.path="
+#define JAVA_CLASSPATH_VAL "~/work/workspace-cpp/hdfs_wfx_java/target/classes"
+
 
 #define FULL_LOG_PATH LOG_PATH LOG_FILE_NAME
 #define MAX_PATH 260
@@ -31,6 +33,6 @@ enum JVMStateEnum {
     JVMLoadFail,
     JVMDetached,
     JVMDetachFail
-}
+};
 
 #endif /* INCLUDE_GENDEF_H_ */
