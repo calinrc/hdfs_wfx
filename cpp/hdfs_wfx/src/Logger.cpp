@@ -42,12 +42,17 @@ void Logger::init(bool consoleEnable, bool fileEnable)
 {
     this->m_isConsoleLoggingEnabled = consoleEnable;
     this->m_isFileLoggingEnabled = fileEnable;
-    if (m_isFileLoggingEnabled)
+
+    if (m_isFileLoggingEnabled && m_file == NULL)
     {
 
         char logPath[MAX_PATH];
         size_t pathSize = MAX_PATH;
 
+        Utilities::mkDirectory(Utilities::getPluginsDir(logPath, &pathSize));
+        pathSize = MAX_PATH;
+        Utilities::mkDirectory(Utilities::getPluginDir(logPath, &pathSize));
+        pathSize = MAX_PATH;
         Utilities::mkDirectory(Utilities::getLoggerDir(logPath, &pathSize));
         pathSize = MAX_PATH;
         Utilities::getLoggerFilePath(logPath, &pathSize);

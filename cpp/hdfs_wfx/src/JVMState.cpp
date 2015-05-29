@@ -44,7 +44,7 @@ JVMStateEnum JVMState::initialize(const char* javaclasspath)
         JavaVMOption* options = new JavaVMOption[1];
 
         char classpath[2048];
-        sprintf(classpath, "%s%s", JAVA_CLASSPATH_KEY, javaclasspath);
+        sprintf(classpath, "%s%s", "-Djava.class.path=", javaclasspath);
         options[0].optionString = classpath;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.nOptions = 1;
@@ -83,11 +83,13 @@ JVMStateEnum JVMState::initialize(const char* javaclasspath)
             }
             if (foundJvm)
             {
+                LOGGING("Try loading JVM dynamic library...");
                 m_handle = dlopen(path, RTLD_LAZY);
 
                 if (m_handle != NULL)
                 {
 
+                    LOGGING("Try creating JVM");
                     JNI_CreateJavaVM_func JNI_CreateJavaVM_loc;
                     JNI_CreateJavaVM_loc = (jint (*)(JavaVM **, void **, void *))dlsym(m_handle, "JNI_CreateJavaVM");
 
@@ -95,10 +97,11 @@ jint                    jvmCreateState = JNI_CreateJavaVM_loc(&m_jvm, (void**) &
 
                     if (jvmCreateState == JNI_OK)
                     {
-
+                        LOGGING("JVM create OK");
+                        m_initialized = true;
                     }
 
-                    LOGGING("Destroy created JVM");
+                    LOGGING("End JVM creation");
                     retVal = JVMLoaded;
                 }
             }

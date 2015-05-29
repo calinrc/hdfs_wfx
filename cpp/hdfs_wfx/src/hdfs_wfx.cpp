@@ -30,11 +30,15 @@
 #include "JVMState.h"
 #include "gendef.h"
 #include "Logger.h"
+#include "Utilities.h"
 
 int gPluginNumber;
 tProgressProc gProgressProc;
 tLogProc gLogProc;
 tRequestProc gRequestProc;
+
+char logPath[MAX_PATH];
+size_t pathSize = MAX_PATH;
 
 int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
@@ -44,14 +48,17 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
     gPluginNumber = PluginNr;
     Logger::getInstance()->init(false, true);
     LOGGING("FSInit");
-    JVMState::instance()->initialize(JAVA_CLASSPATH_VAL);
+
+    char logPath[MAX_PATH];
+    size_t pathSize = MAX_PATH;
+    JVMState::instance()->initialize(Utilities::getJavaClasspathDir(logPath, &pathSize));
 
     return 0;
 }
 
 HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 {
-    LOGGING("FsFindFirst");
+    LOGGING("FsFindFirst on path %s", Path);
     HANDLE handle = NULL;
     return handle;
 }

@@ -19,8 +19,7 @@
 #define LOG_PATH PLUGIN_LOCATION "/logs"
 #define LOG_FILE_NAME "/hdfs_wfx.log"
 
-#define JAVA_CLASSPATH_KEY "-Djava.class.path="
-#define JAVA_CLASSPATH_VAL "~/work/workspace-cpp/hdfs_wfx_java/target/classes"
+#define JAVA_CLASSPATH_VAL PLUGIN_LOCATION "/java"
 
 
 #define FULL_LOG_PATH LOG_PATH LOG_FILE_NAME

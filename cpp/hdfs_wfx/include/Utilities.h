@@ -14,6 +14,9 @@
 #define INCLUDE_UTILITIES_H_
 
 #include <stddef.h>
+#include <stdlib.h>
+#include <pwd.h>
+#include <unistd.h>
 #include "gendef.h"
 #include <sys/stat.h>
 #include <string.h>
@@ -63,14 +66,19 @@ public:
         return getAbsolutePath(FULL_LOG_PATH, retPath, size);
     }
 
+    static char* getJavaClasspathDir(char* retPath, size_t* size)
+    {
+        return getAbsolutePath(JAVA_CLASSPATH_VAL, retPath, size);
+    }
+
 private:
     Utilities();
     virtual ~Utilities();
 
-    static char* getAbsolutePath(const char* part, char* retPath, size_t* size)
+    static char* getAbsolutePath(const char* relativePath, char* retPath, size_t* size)
     {
         char path[MAX_PATH];
-        sprintf(path, "%s/%s", getUserHomeDir(), part);
+        sprintf(path, "%s/%s", getUserHomeDir(), relativePath);
         size_t length = strlen(path);
 
         if (length < *size - 1)
