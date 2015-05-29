@@ -59,6 +59,7 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 {
     LOGGING("FsFindFirst on path %s", Path);
+    memset(FindData,0, sizeof(WIN32_FIND_DATAA));
     HANDLE handle = NULL;
     return handle;
 }
@@ -66,6 +67,7 @@ HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 BOOL FsFindNext(HANDLE Hdl, WIN32_FIND_DATAA *FindData)
 {
     LOGGING("FsFindNext");
+    memset(FindData,0, sizeof(WIN32_FIND_DATAA));
     return 0;
 }
 
@@ -83,19 +85,19 @@ int FsFindClose(HANDLE Hdl)
 
 BOOL FsMkDir(char* Path)
 {
-    LOGGING("FsMkDir");
+    LOGGING("FsMkDir %s", Path);
     return 0;
 }
 
 BOOL FsRemoveDir(char* RemoteName)
 {
-    LOGGING("FsRemoveDir");
+    LOGGING("FsRemoveDir %s", RemoteName);
     return 0;
 }
 
 int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri)
 {
-    LOGGING("FsRenMovFile");
+    LOGGING("FsRenMovFile oldName %s -> newName %s - Move: %d - Overwrite: %d", OldName, NewName, Move, OverWrite);
     return -1;
 }
 
@@ -107,31 +109,31 @@ int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct
 
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
-    LOGGING("FsPutFile");
+    LOGGING("FsPutFile Local path %s in HDFS path %s with flags %d", LocalName, RemoteName, CopyFlags);
     return -1;
 }
 
 int FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
 {
-    LOGGING("FsExecuteFile");
+    LOGGING("FsExecuteFile %s verb %s", RemoteName, Verb);
     return -1;
 }
 
 BOOL FsDeleteFile(char* RemoteName)
 {
-    LOGGING("FsDeleteFile");
+    LOGGING("FsDeleteFile %s", RemoteName);
     return 0;
 }
 
 BOOL FsSetTime(char* RemoteName, FILETIME *CreationTime, FILETIME *LastAccessTime, FILETIME *LastWriteTime)
 {
-    LOGGING("FsSetTime");
+    LOGGING("FsSetTime %s", RemoteName);
     return 0;
 }
 
 BOOL FsDisconnect(char *DisconnectRoot)
 {
-    LOGGING("FsDisconnect");
+    LOGGING("FsDisconnect root %s", DisconnectRoot);
     JVMState::instance()->detach();
     return 0;
 }
