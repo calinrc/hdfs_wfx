@@ -31,6 +31,7 @@
 #include "gendef.h"
 #include "Logger.h"
 #include "Utilities.h"
+#include "FileEnumerator.h"
 
 int gPluginNumber;
 tProgressProc gProgressProc;
@@ -59,16 +60,27 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 {
     LOGGING("FsFindFirst on path %s", Path);
-    memset(FindData,0, sizeof(WIN32_FIND_DATAA));
+    memset(FindData, 0, sizeof(WIN32_FIND_DATAA));
+    FileEnumerator* fEnum = new FileEnumerator();
     HANDLE handle = NULL;
+    if (fEnum->getFirst(Path, FindData))
+    {
+        handle = fEnum;
+    } else
+    {
+        delete fEnum;
+    }
+
     return handle;
 }
 
 BOOL FsFindNext(HANDLE Hdl, WIN32_FIND_DATAA *FindData)
 {
     LOGGING("FsFindNext");
-    memset(FindData,0, sizeof(WIN32_FIND_DATAA));
-    return 0;
+    memset(FindData, 0, sizeof(WIN32_FIND_DATAA));
+    FileEnumerator* fEnum = (FileEnumerator*) Hdl;
+    bool retVal = fEnum->getNext(FindData);
+    return retVal;
 }
 
 int FsFindClose(HANDLE Hdl)
@@ -76,7 +88,8 @@ int FsFindClose(HANDLE Hdl)
     LOGGING("FsFindClose");
     if (Hdl != NULL)
     {
-        delete Hdl;
+        FileEnumerator* fEnum = (FileEnumerator*) Hdl;
+        delete fEnum;
         Hdl = NULL;
     }
 
