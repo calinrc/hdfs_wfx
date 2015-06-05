@@ -32,10 +32,9 @@
 #include "Logger.h"
 #include "Utilities.h"
 #include "FileEnumerator.h"
+#include "HDFSAccessor.h"
 
-int gPluginNumber;
 tProgressProc gProgressProc;
-tLogProc gLogProc;
 tRequestProc gRequestProc;
 
 char logPath[MAX_PATH];
@@ -44,14 +43,19 @@ size_t pathSize = MAX_PATH;
 int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
     gProgressProc = pProgressProc;
-    gLogProc = pLogProc;
     gRequestProc = pRequestProc;
-    gPluginNumber = PluginNr;
-    Logger::getInstance()->init(false, true);
+    Logger::getInstance()->init(false, true, pLogProc, PluginNr);
     LOGGING("FSInit");
 
     char logPath[MAX_PATH];
     size_t pathSize = MAX_PATH;
+//    if (pRequestProc != NULL)
+//    {
+//        char returnedText[100];
+//        strcpy(returnedText, "ReturnedTText");
+//        BOOL rv = pRequestProc(PluginNr, 3, "CustomTitle", "CustomText", returnedText, 100);
+//        LOGGING("requestProc val %d, message %s", rv, returnedText);
+//    }
     JVMState::instance()->initialize(Utilities::getJavaClasspathDir(logPath, &pathSize));
 
     return 0;
@@ -61,9 +65,9 @@ HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 {
     LOGGING("FsFindFirst on path %s", Path);
     memset(FindData, 0, sizeof(WIN32_FIND_DATAA));
-    FileEnumerator* fEnum = new FileEnumerator();
+    FileEnumerator* fEnum = HDFSAccessor::instance()->getFolderContent(Path);
     HANDLE handle = NULL;
-    if (fEnum->getFirst(Path, FindData))
+    if (fEnum->getFirst(FindData))
     {
         handle = fEnum;
     } else

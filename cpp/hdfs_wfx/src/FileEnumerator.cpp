@@ -20,7 +20,7 @@ FileEnumerator::~FileEnumerator()
 {
 }
 
-bool FileEnumerator::getFirst(char* Path, WIN32_FIND_DATAA *FindData)
+bool FileEnumerator::getFirst(WIN32_FIND_DATAA *FindData)
 {
     return false;
 }

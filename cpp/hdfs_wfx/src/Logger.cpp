@@ -25,7 +25,7 @@
 Logger* Logger::s_instance = new Logger();
 
 Logger::Logger() :
-        m_isFileLoggingEnabled(false), m_isConsoleLoggingEnabled(false), m_file(NULL)
+        m_isFileLoggingEnabled(false), m_isConsoleLoggingEnabled(false), m_file(NULL), m_externalLogger(NULL), m_pluginNo(-1)
 {
 }
 
@@ -36,6 +36,13 @@ Logger::~Logger()
         fclose(m_file);
     }
 
+}
+
+void Logger::init(bool consoleEnable, bool fileEnable, tLogProc pLogProc, int pluginNo)
+{
+    this->m_externalLogger = pLogProc;
+    this->m_pluginNo = pluginNo;
+    this->init(consoleEnable, fileEnable);
 }
 
 void Logger::init(bool consoleEnable, bool fileEnable)
@@ -59,6 +66,8 @@ void Logger::init(bool consoleEnable, bool fileEnable)
 
         m_file = fopen(logPath, "a");
     }
+    this->log("Logger initialized");
+
 }
 
 void Logger::end()
@@ -90,6 +99,10 @@ void Logger::log(const char* msg, ...)
             fprintf(stdout, "%s", displayMsg);
             fprintf(stdout, "\n");
 
+        }
+        if (m_externalLogger != NULL)
+        {
+            m_externalLogger(m_pluginNo, 0, displayMsg);
         }
         va_end(args);
         delete[] displayMsg;

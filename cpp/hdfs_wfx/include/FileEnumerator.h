@@ -33,7 +33,7 @@ class FileEnumerator
 {
 public:
     FileEnumerator();
-    bool getFirst(char* Path, WIN32_FIND_DATAA *FindData);
+    bool getFirst(WIN32_FIND_DATAA *FindData);
     bool getNext(WIN32_FIND_DATAA *FindData);
     void close();
     virtual ~FileEnumerator();
@@ -41,7 +41,6 @@ private:
 
     bool getJavaFolderContent(char* Path);
 
-    list<FileInfo*> m_content;
 
 };
 

@@ -16,14 +16,18 @@
 #include <jni.h>
 #include "gendef.h"
 
+typedef jint (*JNI_CreateJavaVM_func)(JavaVM **, void **, void *);
+
 class JVMState
 {
 public:
 
     JVMStateEnum initialize(const char* javaclasspath);
+
+    JNIEnv* getEnv();
+
     JVMStateEnum detach();
     static JVMState* instance();
-
 
 private:
     JVMState();

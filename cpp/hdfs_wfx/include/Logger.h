@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include "gendef.h"
+#include "wfxplugin.h"
 
 class Logger
 {
@@ -25,6 +26,7 @@ public:
         return s_instance;
     }
 
+    void init(bool consoleEnable, bool fileEnable, tLogProc pLogProc, int pluginNo);
     void init(bool consoleEnable, bool fileEnable);
     void end();
     void log(const char* msg, ...);
@@ -36,6 +38,8 @@ private:
     bool m_isFileLoggingEnabled;
     bool m_isConsoleLoggingEnabled;
     FILE* m_file;
+    tLogProc m_externalLogger;
+    int m_pluginNo;
     static Logger* s_instance;
 };
 
