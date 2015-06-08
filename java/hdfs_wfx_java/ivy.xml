@@ -1,0 +1,16 @@
+<ivy-module version="1.0">
+  <info organisation="hdfs_wfx" module="hdfs_wfx_java" status="integration" />
+  <configurations>
+    <conf name="build" />
+  </configurations>
+
+  <publications>
+    <artifact name="hdfs_wfx" type="jar" ext="jar" />
+  </publications>
+
+  <dependencies>
+    <dependency org="org.apache.hadoop" name="hadoop-common" rev="${hadoop.version}"/>
+    <dependency org="org.apache.hadoop" name="hadoop-client" rev="${hadoop.version}"/>
+    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="${hadoop.version}"/>
+  </dependencies> 
+</ivy-module>

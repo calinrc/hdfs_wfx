@@ -1,0 +1,11 @@
+<ivysettings>
+    <settings defaultResolver="central" defaultConflictManager="all" circularDependencyStrategy="error" />
+    <caches  useOrigin="true" artifactPattern="[organisation]/[module]/[artifact].[ext]"/>
+    <resolvers>
+        <ibiblio name="central" m2compatible="true"/>
+        <filesystem name="local">
+            <ivy pattern="${ivy.default.ivy.user.dir}/wfx_repo/[organisation]/[module]/[revision]/ivy/ivy.xml" />
+            <artifact pattern="${ivy.default.ivy.user.dir}/wfx_repo/[organisation]/[module]/[revision]/[type]/[artifact].[ext]" />
+        </filesystem>
+    </resolvers>
+</ivysettings>
