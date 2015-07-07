@@ -57,6 +57,8 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 //        LOGGING("requestProc val %d, message %s", rv, returnedText);
 //    }
     JVMState::instance()->initialize(Utilities::getJavaClasspathDir(logPath, &pathSize));
+    HDFSAccessor::instance()->initialize();
+
 
     return 0;
 }

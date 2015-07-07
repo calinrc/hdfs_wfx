@@ -14,6 +14,7 @@
 #define INCLUDE_HDFSACCESSOR_H_
 
 #include "FileEnumerator.h"
+#include <jni.h>
 
 class HDFSAccessor
 {
@@ -24,11 +25,17 @@ public:
         return s_instance;
     }
 
+    int initialize();
+    void release();
+
     FileEnumerator* getFolderContent(char* path);
 
 private:
     HDFSAccessor();
     virtual ~HDFSAccessor();
+
+    jclass m_wfxPairClass;
+    jobject m_wfxPairObj;
 
     static HDFSAccessor* s_instance;
 };
