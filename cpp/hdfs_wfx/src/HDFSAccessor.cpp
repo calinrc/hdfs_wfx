@@ -16,7 +16,8 @@
 
 HDFSAccessor* HDFSAccessor::s_instance = new HDFSAccessor();
 
-HDFSAccessor::HDFSAccessor()
+HDFSAccessor::HDFSAccessor() :
+        m_wfxPairClass(NULL), m_wfxPairObj(NULL)
 {
 
 }
@@ -46,15 +47,16 @@ int HDFSAccessor::initialize()
 void HDFSAccessor::release()
 {
     JNIEnv* env = JVMState::instance()->getEnv();
-    if (m_wfxPairClass != NULL){
+    if (m_wfxPairClass != NULL)
+    {
         env->DeleteGlobalRef(m_wfxPairClass);
         m_wfxPairClass = NULL;
     }
-    if (m_wfxPairObj != NULL){
+    if (m_wfxPairObj != NULL)
+    {
         env->DeleteGlobalRef(m_wfxPairObj);
         m_wfxPairObj = NULL;
     }
-
 
 }
 
