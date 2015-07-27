@@ -1,18 +1,32 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="../hdfs_wfx_java" default="build" name="hdfs_wfx_java">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="hdfs_wfx_java">
 
-    <target name="build" depends="compile, pack" />
+	<property file="../build/build.properties" />
 
-    <target name="compile">
-    </target>
+	<target name="init">
+		<ivy:settings file="../build/ivysettings.xml" />
+	</target>
 
-    <target name="pack">
+	<target name="build" depends="compile, pack" />
 
-    </target>
+	<target name="compile">
+	</target>
 
-    <target name="deploy">
-        
-    </target>
+	<target name="pack">
 
-    <target name="clean">
-    </target>
+	</target>
+
+	<target name="deploy">
+
+	</target>
+
+	<target name="clean" depends="init">
+		<delete dir="${basedir}/lib"/>
+		<ivy:cleancache />
+	</target>
+
+	<target name="retrieve" depends="init">
+		<ivy:retrieve/>
+	</target>
+
+
 </project>
