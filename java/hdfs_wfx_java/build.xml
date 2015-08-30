@@ -6,13 +6,21 @@
 		<ivy:settings file="../build/ivysettings.xml" />
 	</target>
 
-	<target name="build" depends="compile, pack" />
+	<target name="build" depends="retrieve, compile, pack" />
 
 	<target name="compile">
+		<mkdir dir="${basedir}/../build/target/${ant.project.name}/bin" />
+		<javac srcdir="${basedir}/src/main/java" destdir="${basedir}/../build/target/${ant.project.name}/bin" target="1.7">
+			<classpath>
+				<fileset dir="${basedir}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
 	</target>
 
 	<target name="pack">
-
+		<jar destfile="../build/target/${ant.project.name}/hdfs_wfx.jar" basedir="${basedir}/../build/target/${ant.project.name}/bin" />
 	</target>
 
 	<target name="deploy">
@@ -20,12 +28,13 @@
 	</target>
 
 	<target name="clean" depends="init">
-		<delete dir="${basedir}/lib"/>
+		<delete dir="${basedir}/lib" />
+		<delete dir="${basedir}/../build/target" />
 		<ivy:cleancache />
 	</target>
 
 	<target name="retrieve" depends="init">
-		<ivy:retrieve/>
+		<ivy:retrieve />
 	</target>
 
 
