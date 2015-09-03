@@ -120,7 +120,6 @@ JNIEnv* JVMState::getEnv()
 {
 
     JNIEnv* env = NULL;
-    ;
     if (m_jvm != NULL)
     {
         if (JNI_OK != m_jvm->GetEnv((void **) &env, JNI_VERSION_1_2))

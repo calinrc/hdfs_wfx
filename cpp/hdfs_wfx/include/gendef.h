@@ -36,7 +36,5 @@ enum JVMStateEnum {
     JVMDetachFail
 };
 
-#define CONSTRUCTOR_NAME "<init>"
-
 
 #endif /* INCLUDE_GENDEF_H_ */

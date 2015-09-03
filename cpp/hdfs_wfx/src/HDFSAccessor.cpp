@@ -13,6 +13,9 @@
 #include <HDFSAccessor.h>
 #include "gendef.h"
 #include "JVMState.h"
+#include <assert.h>
+#include <string>
+#include <set>
 
 HDFSAccessor* HDFSAccessor::s_instance = new HDFSAccessor();
 
@@ -24,6 +27,7 @@ HDFSAccessor::HDFSAccessor() :
 
 HDFSAccessor::~HDFSAccessor()
 {
+    release();
 }
 
 int HDFSAccessor::initialize()
@@ -34,9 +38,14 @@ int HDFSAccessor::initialize()
     {
         m_wfxPairClass = static_cast<jclass>(env->NewGlobalRef(wfxPairClass));
         env->DeleteLocalRef(wfxPairClass);
-        jmethodID constructorMetId = env->GetMethodID(m_wfxPairClass, CONSTRUCTOR_NAME, "()V");
+        jmethodID constructorMetId = env->GetMethodID(m_wfxPairClass, "<init>", "()V");
         jobject wfxPaitrObj = env->NewObject(m_wfxPairClass, constructorMetId);
-        m_wfxPairObj = static_cast<jclass>(env->NewGlobalRef(wfxPaitrObj));
+        assert(wfxPaitrObj != NULL);
+        m_wfxPairObj = env->NewGlobalRef(wfxPaitrObj);
+        jmethodID initFS = env->GetMethodID(m_wfxPairClass, "initFS", "()I");
+        jint result = env->CallIntMethod(m_wfxPairObj, initFS);
+        assert(result != 0);
+
         env->DeleteLocalRef(m_wfxPairObj);
         return 0;
     }
@@ -62,5 +71,33 @@ void HDFSAccessor::release()
 
 FileEnumerator* HDFSAccessor::getFolderContent(char* path)
 {
+    JNIEnv* env = JVMState::instance()->getEnv();
+    if (m_wfxPairClass != NULL && m_wfxPairObj != NULL)
+    {
+        jmethodID getFolderContentMetId = env->GetMethodID(m_wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
+        jstring pathStr = env->NewStringUTF(path);
+        jobjectArray contentArray = static_cast<jobjectArray>(env->CallObjectMethod(m_wfxPairObj, getFolderContentMetId, pathStr));
+        env->DeleteLocalRef(pathStr);
+        if (contentArray != NULL)
+        {
+            set<string> contentItems;
+            jsize len = env->GetArrayLength(contentArray);
+            for (jsize i = 0; i < len; i++)
+            {
+                jstring elem = static_cast<jstring>(env->GetObjectArrayElement(contentArray, i));
+                if (elem != NULL)
+                {
+                    const char *str = env->GetStringUTFChars(elem, NULL);
+                    string item(str);
+                    contentItems.insert(item);
+                    env->ReleaseStringUTFChars(elem, str);
+
+                }
+            }
+            string pathStr(path);
+            return new FileEnumerator(pathStr, contentItems);
+        }
+    }
     return NULL;
 }
+

@@ -14,7 +14,8 @@
 #define INCLUDE_FILEENUMERATOR_H_
 
 #include "wfxplugin.h"
-#include <list>
+#include <set>
+#include <string>
 
 struct FileInfo
 {
@@ -32,14 +33,17 @@ using namespace std;
 class FileEnumerator
 {
 public:
-    FileEnumerator();
+    FileEnumerator(string& parentPath, set<string>& content);
     bool getFirst(WIN32_FIND_DATAA *FindData);
     bool getNext(WIN32_FIND_DATAA *FindData);
     void close();
     virtual ~FileEnumerator();
 private:
 
-    bool getJavaFolderContent(char* Path);
+    string m_parent;
+    set<string> m_content;
+
+
 
 
 };

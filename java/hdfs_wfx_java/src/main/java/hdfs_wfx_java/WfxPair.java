@@ -1,8 +1,10 @@
 package hdfs_wfx_java;
 
-
-
 public class WfxPair {
+
+	public WfxPair() {
+
+	}
 
 	private FileSystemProxy fileSystem;
 
@@ -36,6 +38,18 @@ public class WfxPair {
 			return WfxErrorCodes.OK.ordinal();
 		} catch (Throwable thr) {
 			return WfxErrorCodes.InitializationError.ordinal();
+		}
+	}
+
+	/**
+	 * @param folderPath
+	 * @return String[]
+	 */
+	public String[] getFolderContent(String folderPath) {
+		try {
+			return fileSystem.getFolderContent(folderPath);
+		} catch (Throwable thr) {
+			return null;
 		}
 	}
 

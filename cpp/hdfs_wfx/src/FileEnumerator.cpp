@@ -12,7 +12,8 @@
 
 #include <FileEnumerator.h>
 
-FileEnumerator::FileEnumerator()
+FileEnumerator::FileEnumerator(string& parentPath, set<string>& content) :
+        m_parent(parentPath), m_content(content)
 {
 }
 
@@ -34,7 +35,8 @@ void FileEnumerator::close()
 
 }
 
-bool getJavaFolderContent(char* Path){
+bool getJavaFolderContent(char* Path)
+{
     return false;
 }
 
