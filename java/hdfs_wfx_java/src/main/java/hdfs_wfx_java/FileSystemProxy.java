@@ -41,7 +41,7 @@ public class FileSystemProxy {
 				List<String> contentList = new ArrayList<String>();
 				FileStatus[] fstatuses = this.fileSystem.listStatus(fPath);
 				for (FileStatus status : fstatuses) {
-					contentList.add(status.getPath().toString());
+					contentList.add(status.getPath().getName());
 				}
 				return contentList.toArray(new String[contentList.size()]);
 			} else {
@@ -50,6 +50,18 @@ public class FileSystemProxy {
 
 		} catch (IOException ioEx) {
 			log.error("FAIL on getting folder content for " + folderPath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
+	public FileInformation getFileInformation(String parentFolder,
+			String fileName) {
+		try {
+			FileStatus fstatus = this.fileSystem.getFileStatus(new Path(parentFolder + "/"+ fileName));
+			return new FileInformation(fstatus);
+		} catch (IOException ioEx) {
+			log.error("FAIL on getting file info for " + parentFolder + "/"
+					+ fileName, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}

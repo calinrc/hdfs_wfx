@@ -63,12 +63,92 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
     return 0;
 }
 
+/*
+static void GFileInfoToWin32FindData (GFile *reference_file, GFileInfo *info, WIN32_FIND_DATAA *FindData)
+{
+  GFileInfo *symlink_info = NULL;
+  GError *error = NULL;
+
+  g_assert (info != NULL);
+  g_assert (FindData != NULL);
+
+  g_strlcpy(FindData->cFileName, g_file_info_get_name (info), MAX_PATH);
+  // File size
+  goffset filesize = g_file_info_get_size (info);
+  FindData->nFileSizeLow = (DWORD)filesize;
+  FindData->nFileSizeHigh = filesize >> 32;
+  // File attributes
+  FindData->dwFileAttributes |= FILE_ATTRIBUTE_UNIX_MODE;
+  FindData->dwReserved0 = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE);
+  // File date/time
+  if (!UnixTimeToFileTime(g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED), &FindData->ftLastWriteTime))
+    {
+          FindData->ftLastWriteTime.dwHighDateTime = 0xFFFFFFFF;
+          FindData->ftLastWriteTime.dwLowDateTime = 0xFFFFFFFE;
+    }
+  if (!UnixTimeToFileTime(g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS), &FindData->ftLastAccessTime))
+    {
+          FindData->ftLastAccessTime.dwHighDateTime = 0xFFFFFFFF;
+          FindData->ftLastAccessTime.dwLowDateTime = 0xFFFFFFFE;
+    }
+  if (!UnixTimeToFileTime(g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CREATED), &FindData->ftCreationTime))
+    {
+          FindData->ftCreationTime.dwHighDateTime = 0xFFFFFFFF;
+          FindData->ftCreationTime.dwLowDateTime = 0xFFFFFFFE;
+    }
+
+//  g_print ("(II) GFileInfoToWin32FindData: type = %d\n", g_file_info_get_file_type (info));
+//  g_print ("(II) GFileInfoToWin32FindData: UNIX_MODE = %d\n", FindData->dwReserved0);
+
+  switch (g_file_info_get_file_type (info)) {
+      case G_FILE_TYPE_DIRECTORY:
+      case G_FILE_TYPE_SHORTCUT:   //  Used in network:///
+      case G_FILE_TYPE_MOUNTABLE:
+        FindData->dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
+        break;
+      case G_FILE_TYPE_SYMBOLIC_LINK:
+        FindData->dwReserved0 |= S_IFLNK;
+
+        // Check: file is symlink to directory
+        symlink_info = g_file_query_info (reference_file, G_FILE_ATTRIBUTE_UNIX_MODE,
+                                          G_FILE_QUERY_INFO_NONE, NULL, &error);
+
+        if (error) {
+          g_print ("(EE) GFileInfoToWin32FindData: g_file_query_info() error: %s\n", error->message);
+          g_error_free (error);
+        }
+
+        if (symlink_info)
+    {
+          if (g_file_info_get_file_type (symlink_info) == G_FILE_TYPE_DIRECTORY)
+      {
+        FindData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
+      }
+      g_object_unref (symlink_info);
+    }
+        break;
+      case G_FILE_TYPE_UNKNOWN:
+      case G_FILE_TYPE_REGULAR:
+      case G_FILE_TYPE_SPECIAL:
+    break;
+    }
+
+    //fallback to default file mode if read fails
+  if (FindData->dwReserved0 == 0) {
+    if ((FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+      FindData->dwReserved0 = S_IFDIR + S_IRWXU + S_IRGRP + S_IXGRP + S_IROTH + S_IXOTH;
+    else
+      FindData->dwReserved0 = S_IRUSR + S_IWUSR + S_IRGRP + S_IROTH;
+  }
+}
+*/
+
 HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
 {
     LOGGING("FsFindFirst on path %s", Path);
     memset(FindData, 0, sizeof(WIN32_FIND_DATAA));
     FileEnumerator* fEnum = HDFSAccessor::instance()->getFolderContent(Path);
-    HANDLE handle = NULL;
+    HANDLE handle = (HANDLE)(-1);
     if (fEnum->getFirst(FindData))
     {
         handle = fEnum;

@@ -52,5 +52,13 @@ public class WfxPair {
 			return null;
 		}
 	}
+	
+	public FileInformation getFileInformation(String parentFolder, String fileName){
+		try {
+			return fileSystem.getFileInformation(parentFolder, fileName);
+		} catch (Throwable thr) {
+			return null;
+		}
+	}
 
 }
