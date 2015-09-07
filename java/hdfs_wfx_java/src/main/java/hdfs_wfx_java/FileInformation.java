@@ -6,6 +6,18 @@ public class FileInformation {
 	private static final long FILE_ATTRIBUTE_UNIX_MODE = 0x80000000;
 	private static final long FILE_ATTRIBUTE_DIRECTORY = 16;
 
+	private static int S_IRUSR = 0400; /* Read by owner. */
+	private static int S_IWUSR = 0200; /* Write by owner. */
+	private static int S_IXUSR = 0100; /* Execute by owner. */
+
+	private static int S_IRGRP = (S_IRUSR >> 3); /* Read by group. */
+	private static int S_IWGRP = (S_IWUSR >> 3); /* Write by group. */
+	private static int S_IXGRP = (S_IXUSR >> 3); /* Execute by group. */
+
+	private static int S_IROTH = (S_IRGRP >> 3); /* Read by others. */
+	private static int S_IWOTH = (S_IWGRP >> 3); /* Write by others. */
+	private static int S_IXOTH = (S_IXGRP >> 3); /* Execute by others. */
+
 	private int fileAttributes;
 	private long fileCreationTime;
 	private long fileLastAccessTime;
@@ -19,7 +31,7 @@ public class FileInformation {
 		boolean isDir = fstatus.isDirectory();
 
 		this.fileAttributes |= FILE_ATTRIBUTE_UNIX_MODE;
-		if (isDir){
+		if (isDir) {
 			this.fileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
 		}
 
@@ -31,9 +43,9 @@ public class FileInformation {
 		} else {
 			this.fileSize = 0;
 		}
-		// this.reserverd0 = 0; 
-		
-		//TODO continue here
+		this.reserverd0 = 0;
+
+		// TODO continue here
 		this.reserverd1 = 0;
 		this.fileName = fstatus.getPath().getName();
 
