@@ -18,9 +18,19 @@
 #include <set>
 
 HDFSAccessor* HDFSAccessor::s_instance = new HDFSAccessor();
+jmethodID HDFSAccessor::s_WfxPairMetIdConstructor = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdInitFS = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdGetFolderContent = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdGetFileInfo = NULL;
+
+jmethodID HDFSAccessor::s_FileInfoGetFileAttributes = NULL;
+jmethodID HDFSAccessor::s_FileInfoGetFileCreationTime = NULL;
+jmethodID HDFSAccessor::s_FileInfoGetFileLastAccessTime = NULL;
+jmethodID HDFSAccessor::s_FileInfoGetFileSize = NULL;
+jmethodID HDFSAccessor::s_FileInfoGetReserved0 = NULL;
 
 HDFSAccessor::HDFSAccessor() :
-        m_wfxPairClass(NULL), m_wfxPairObj(NULL)
+        m_wfxPairObj(NULL)
 {
 
 }
@@ -34,33 +44,53 @@ int HDFSAccessor::initialize()
 {
     JNIEnv* env = JVMState::instance()->getEnv();
     jclass wfxPairClass = static_cast<jclass>(env->FindClass("hdfs_wfx_java/WfxPair"));
-    if (m_wfxPairClass != NULL)
+    if (wfxPairClass != NULL)
     {
-        m_wfxPairClass = static_cast<jclass>(env->NewGlobalRef(wfxPairClass));
-        env->DeleteLocalRef(wfxPairClass);
-        jmethodID constructorMetId = env->GetMethodID(m_wfxPairClass, "<init>", "()V");
-        jobject wfxPaitrObj = env->NewObject(m_wfxPairClass, constructorMetId);
-        assert(wfxPaitrObj != NULL);
-        m_wfxPairObj = env->NewGlobalRef(wfxPaitrObj);
-        jmethodID initFS = env->GetMethodID(m_wfxPairClass, "initFS", "()I");
-        jint result = env->CallIntMethod(m_wfxPairObj, initFS);
-        assert(result != 0);
+        s_WfxPairMetIdConstructor = env->GetMethodID(wfxPairClass, "<init>", "()V");
+        assert(s_WfxPairMetIdConstructor != NULL);
 
-        env->DeleteLocalRef(m_wfxPairObj);
+        s_WfxPairMetIdInitFS = env->GetMethodID(wfxPairClass, "initFS", "()I");
+        assert(s_WfxPairMetIdInitFS != NULL);
+
+        s_WfxPairMetIdGetFolderContent = env->GetMethodID(wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
+        assert(s_WfxPairMetIdGetFolderContent != NULL);
+
+        s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation", "(Ljava/lang/String;Ljava/lang/String;)Lhdfs_wfx_java/FileInformation;");
+        assert(s_WfxPairMetIdGetFileInfo != NULL);
+
+        jobject wfxPairObj = env->NewObject(wfxPairClass, s_WfxPairMetIdConstructor);
+        assert(wfxPairObj != NULL);
+        m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
+        jint result = env->CallIntMethod(m_wfxPairObj, s_WfxPairMetIdInitFS);
+        assert(result != 0);
+        initFileEnumerator(env);
+
+        env->DeleteLocalRef(wfxPairObj);
+        env->DeleteLocalRef(wfxPairClass);
         return 0;
     }
     return -1;
+}
 
+void HDFSAccessor::initFileEnumerator(JNIEnv* env)
+{
+    jclass wfxFileInformationClass = static_cast<jclass>(env->FindClass("hdfs_wfx_java/FileInformation"));
+    assert(wfxFileInformationClass != NULL);
+    s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()I");
+    assert(s_FileInfoGetFileAttributes != NULL);
+    s_FileInfoGetFileCreationTime = env->GetMethodID(wfxFileInformationClass, "getFileCreationTime", "()J");
+    assert(s_FileInfoGetFileCreationTime != NULL);
+    s_FileInfoGetFileLastAccessTime = env->GetMethodID(wfxFileInformationClass, "getFileLastAccessTime", "()J");
+    assert(s_FileInfoGetFileLastAccessTime != NULL);
+    s_FileInfoGetFileSize = env->GetMethodID(wfxFileInformationClass, "getFileSize", "()J");
+    assert(s_FileInfoGetFileSize != NULL);
+    s_FileInfoGetReserved0 = env->GetMethodID(wfxFileInformationClass, "getReserved0", "()I");
+    assert(s_FileInfoGetReserved0 != NULL);
 }
 
 void HDFSAccessor::release()
 {
     JNIEnv* env = JVMState::instance()->getEnv();
-    if (m_wfxPairClass != NULL)
-    {
-        env->DeleteGlobalRef(m_wfxPairClass);
-        m_wfxPairClass = NULL;
-    }
     if (m_wfxPairObj != NULL)
     {
         env->DeleteGlobalRef(m_wfxPairObj);
@@ -72,11 +102,10 @@ void HDFSAccessor::release()
 FileEnumerator* HDFSAccessor::getFolderContent(char* path)
 {
     JNIEnv* env = JVMState::instance()->getEnv();
-    if (m_wfxPairClass != NULL && m_wfxPairObj != NULL)
+    if (m_wfxPairObj != NULL)
     {
-        jmethodID getFolderContentMetId = env->GetMethodID(m_wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
         jstring pathStr = env->NewStringUTF(path);
-        jobjectArray contentArray = static_cast<jobjectArray>(env->CallObjectMethod(m_wfxPairObj, getFolderContentMetId, pathStr));
+        jobjectArray contentArray = static_cast<jobjectArray>(env->CallObjectMethod(m_wfxPairObj, s_WfxPairMetIdGetFolderContent, pathStr));
         env->DeleteLocalRef(pathStr);
         if (contentArray != NULL)
         {
@@ -91,13 +120,11 @@ FileEnumerator* HDFSAccessor::getFolderContent(char* path)
                     string item(str);
                     contentItems.insert(item);
                     env->ReleaseStringUTFChars(elem, str);
-
                 }
             }
             string pathStr(path);
-            return new FileEnumerator(pathStr, contentItems);
+            return new FileEnumerator(env, m_wfxPairObj, pathStr, contentItems);
         }
     }
     return NULL;
 }
-

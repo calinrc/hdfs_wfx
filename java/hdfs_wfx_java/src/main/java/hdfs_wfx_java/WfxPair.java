@@ -6,7 +6,7 @@ public class WfxPair {
 
 	}
 
-	private FileSystemProxy fileSystem;
+	private FileSystemProxy fSystemProxy;
 
 	private long nativePtr = 0;
 
@@ -33,8 +33,8 @@ public class WfxPair {
 	 */
 	public int initFS() {
 		try {
-			fileSystem = new FileSystemProxy();
-			fileSystem.init();
+			fSystemProxy = new FileSystemProxy();
+			fSystemProxy.init();
 			return WfxErrorCodes.OK.ordinal();
 		} catch (Throwable thr) {
 			return WfxErrorCodes.InitializationError.ordinal();
@@ -47,7 +47,7 @@ public class WfxPair {
 	 */
 	public String[] getFolderContent(String folderPath) {
 		try {
-			return fileSystem.getFolderContent(folderPath);
+			return fSystemProxy.getFolderContent(folderPath);
 		} catch (Throwable thr) {
 			return null;
 		}
@@ -55,7 +55,7 @@ public class WfxPair {
 	
 	public FileInformation getFileInformation(String parentFolder, String fileName){
 		try {
-			return fileSystem.getFileInformation(parentFolder, fileName);
+			return fSystemProxy.getFileInformation(parentFolder, fileName);
 		} catch (Throwable thr) {
 			return null;
 		}

@@ -11,32 +11,94 @@
  ********************************************************************************************************************* */
 
 #include <FileEnumerator.h>
+#include <HDFSAccessor.h>
+#include <string.h>
+#include "JVMState.h"
+#include "common.h"
 
-FileEnumerator::FileEnumerator(string& parentPath, set<string>& content) :
-        m_parent(parentPath), m_content(content)
+FileEnumerator::FileEnumerator(JNIEnv* env, jobject wfxPairObj, string& parentPath, set<string>& content) :
+        m_parent(parentPath), m_content(content), m_wfxPairObj(NULL)
 {
+    m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
+    m_it = m_content.begin();
 }
 
 FileEnumerator::~FileEnumerator()
 {
-}
-
-bool FileEnumerator::getFirst(WIN32_FIND_DATAA *FindData)
-{
-    return false;
+    this->close();
 }
 
 bool FileEnumerator::getNext(WIN32_FIND_DATAA *FindData)
 {
-    return false;
+    bool hasContent = m_it != m_content.end();
+    if (hasContent)
+    {
+        ++m_it;
+        string item = *m_it;
+        JNIEnv* env = JVMState::instance()->getEnv();
+        jobject fileInfoObj = getFileInfo(env, m_parent, item);
+        if (fileInfoObj != NULL)
+        {
+            getFileInfoContent(env, fileInfoObj, item, FindData);
+            env->DeleteLocalRef(fileInfoObj);
+        } else
+        {
+            hasContent = false;
+        }
+
+    }
+    return hasContent;
 }
 void FileEnumerator::close()
 {
-
+    if (m_wfxPairObj != NULL)
+    {
+        JNIEnv* env = JVMState::instance()->getEnv();
+        env->DeleteGlobalRef(m_wfxPairObj);
+        m_wfxPairObj = NULL;
+    }
 }
 
-bool getJavaFolderContent(char* Path)
+jobject FileEnumerator::getFileInfo(JNIEnv* env, string& path, string& item)
 {
-    return false;
+    if (m_wfxPairObj != NULL)
+    {
+        jstring pathStr = env->NewStringUTF(path.c_str());
+        jstring itemStr = env->NewStringUTF(item.c_str());
+        jobject fileInfo = env->CallObjectMethod(m_wfxPairObj, HDFSAccessor::s_WfxPairMetIdGetFileInfo, pathStr, itemStr);
+        env->DeleteLocalRef(pathStr);
+        env->DeleteLocalRef(itemStr);
+        return fileInfo;
+    }
+    return NULL;
+}
+
+void FileEnumerator::getFileInfoContent(JNIEnv* env, jobject fileInfoItem, string& itemName, WIN32_FIND_DATAA *findData)
+{
+    memset(findData, 0, sizeof(WIN32_FIND_DATAA));
+
+    strncpy(findData->cFileName, itemName.c_str(), MAX_PATH);
+    jint fileAttributes = env->CallIntMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileAttributes);
+    findData->dwFileAttributes = fileAttributes;
+    jlong fileCreationTime = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileCreationTime);
+    findData->ftCreationTime.dwLowDateTime = (DWORD) fileCreationTime;
+    findData->ftCreationTime.dwHighDateTime = fileCreationTime >> 32;
+
+    findData->ftLastWriteTime.dwLowDateTime = (DWORD) fileCreationTime;
+    findData->ftLastWriteTime.dwHighDateTime = fileCreationTime >> 32;
+
+    jlong fileAccessTime = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileLastAccessTime);
+    findData->ftLastAccessTime.dwLowDateTime = (DWORD) fileAccessTime;
+    findData->ftLastAccessTime.dwHighDateTime = fileAccessTime >> 32;
+
+    jlong fileSize = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileSize);
+
+    findData->nFileSizeLow = (DWORD) fileSize;
+    findData->nFileSizeHigh = fileSize >> 32;
+
+    jint reserved0Val = env->CallIntMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetReserved0);
+
+    findData->dwReserved0 = reserved0Val;
+
 }
 

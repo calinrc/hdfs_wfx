@@ -33,11 +33,23 @@ public:
 private:
     HDFSAccessor();
     virtual ~HDFSAccessor();
+    void initFileEnumerator(JNIEnv* env);
 
-    jclass m_wfxPairClass;
     jobject m_wfxPairObj;
 
     static HDFSAccessor* s_instance;
+
+public:
+    static jmethodID s_WfxPairMetIdConstructor;
+    static jmethodID s_WfxPairMetIdInitFS;
+    static jmethodID s_WfxPairMetIdGetFolderContent;
+    static jmethodID s_WfxPairMetIdGetFileInfo;
+
+    static jmethodID s_FileInfoGetFileAttributes;
+    static jmethodID s_FileInfoGetFileCreationTime;
+    static jmethodID s_FileInfoGetFileLastAccessTime;
+    static jmethodID s_FileInfoGetFileSize;
+    static jmethodID s_FileInfoGetReserved0;
 };
 
 #endif /* INCLUDE_HDFSACCESSOR_H_ */

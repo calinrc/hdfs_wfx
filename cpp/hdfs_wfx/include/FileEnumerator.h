@@ -16,6 +16,7 @@
 #include "wfxplugin.h"
 #include <set>
 #include <string>
+#include <jni.h>
 
 struct FileInfo
 {
@@ -33,15 +34,18 @@ using namespace std;
 class FileEnumerator
 {
 public:
-    FileEnumerator(string& parentPath, set<string>& content);
-    bool getFirst(WIN32_FIND_DATAA *FindData);
+    FileEnumerator(JNIEnv* env, jobject wfxPairObj, string& parentPath, set<string>& content);
     bool getNext(WIN32_FIND_DATAA *FindData);
     void close();
     virtual ~FileEnumerator();
 private:
+    jobject getFileInfo(JNIEnv* env, string& path, string& item);
+    void getFileInfoContent(JNIEnv* env, jobject fileInfoItem,string& itemName, WIN32_FIND_DATAA *findData);
 
     string m_parent;
     set<string> m_content;
+    jobject m_wfxPairObj;
+    set<string>::iterator m_it;
 
 
 
