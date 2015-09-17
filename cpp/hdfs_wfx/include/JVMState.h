@@ -26,6 +26,8 @@ public:
 
     JNIEnv* getEnv();
 
+    bool exceptionExists(JNIEnv* env);
+
     JVMStateEnum detach();
     static JVMState* instance();
 

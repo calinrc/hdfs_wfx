@@ -44,7 +44,7 @@ int HDFSAccessor::initialize()
 {
     JNIEnv* env = JVMState::instance()->getEnv();
     jclass wfxPairClass = static_cast<jclass>(env->FindClass("hdfs_wfx_java/WfxPair"));
-    if (wfxPairClass != NULL)
+    if (!JVMState::instance()->exceptionExists(env))
     {
         s_WfxPairMetIdConstructor = env->GetMethodID(wfxPairClass, "<init>", "()V");
         assert(s_WfxPairMetIdConstructor != NULL);
@@ -55,7 +55,8 @@ int HDFSAccessor::initialize()
         s_WfxPairMetIdGetFolderContent = env->GetMethodID(wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
         assert(s_WfxPairMetIdGetFolderContent != NULL);
 
-        s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation", "(Ljava/lang/String;Ljava/lang/String;)Lhdfs_wfx_java/FileInformation;");
+        s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation",
+                                                     "(Ljava/lang/String;Ljava/lang/String;)Lhdfs_wfx_java/FileInformation;");
         assert(s_WfxPairMetIdGetFileInfo != NULL);
 
         jobject wfxPairObj = env->NewObject(wfxPairClass, s_WfxPairMetIdConstructor);
@@ -68,7 +69,8 @@ int HDFSAccessor::initialize()
         env->DeleteLocalRef(wfxPairObj);
         env->DeleteLocalRef(wfxPairClass);
         return 0;
-    }else{
+    } else
+    {
         assert(false);
     }
     return -1;

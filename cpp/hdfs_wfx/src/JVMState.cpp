@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
+#include <string.h>
 
 JVMState* JVMState::s_instance = new JVMState();
 
@@ -29,19 +30,19 @@ JVMState::~JVMState()
 {
 }
 
-JVMStateEnum JVMState::initialize(const char* javaclasspath)
+JVMStateEnum JVMState::initialize(const char* javaclasspathDir)
 {
 
     JVMStateEnum retVal = JVMLoadFail;
     if (!m_initialized)
     {
-        LOGGING("Start creating JVM");
 
+        LOGGING("Start creating JVM");
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
         JavaVMOption* options = new JavaVMOption[1];
 
         char classpath[2048];
-        sprintf(classpath, "%s%s", "-Djava.class.path=", javaclasspath);
+        sprintf(classpath, "-Djava.class.path=%s", javaclasspathDir);
         options[0].optionString = classpath;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.nOptions = 1;
@@ -130,7 +131,6 @@ JNIEnv* JVMState::getEnv()
 
     }
     return env;
-
 }
 
 JVMStateEnum JVMState::detach()
@@ -148,6 +148,17 @@ JVMStateEnum JVMState::detach()
     }
     m_initialized = false;
     return retVal;
+}
+
+bool JVMState::exceptionExists(JNIEnv* env)
+{
+    jboolean exceptionExists = env->ExceptionCheck();
+    if (exceptionExists)
+    {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+    }
+    return exceptionExists;
 }
 
 JVMState* JVMState::instance()
