@@ -34,6 +34,8 @@
 #include "FileEnumerator.h"
 #include "HDFSAccessor.h"
 
+HANDLE INVALID_HANDLE = (HANDLE) -1;
+
 tProgressProc gProgressProc;
 tRequestProc gRequestProc;
 
@@ -57,7 +59,8 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 //        LOGGING("requestProc val %d, message %s", rv, returnedText);
 //    }
     JVMState::instance()->initialize(Utilities::getJavaClasspathDir(logPath, &pathSize));
-    HDFSAccessor::instance()->initialize();
+    int initialized = HDFSAccessor::instance()->initialize();
+    LOGGING("HDFSAccesstor initialization done %d", initialized);
 
     return 0;
 }
@@ -67,7 +70,7 @@ HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
     LOGGING("FsFindFirst on path %s", Path);
     memset(FindData, 0, sizeof(WIN32_FIND_DATAA));
     FileEnumerator* fEnum = HDFSAccessor::instance()->getFolderContent(Path);
-    HANDLE handle = (HANDLE) (-1);
+    HANDLE handle = INVALID_HANDLE;
     if (fEnum != NULL)
     {
         if (fEnum->getNext(FindData))
@@ -95,7 +98,7 @@ BOOL FsFindNext(HANDLE Hdl, WIN32_FIND_DATAA *FindData)
 int FsFindClose(HANDLE Hdl)
 {
     LOGGING("FsFindClose");
-    if (Hdl != NULL)
+    if (Hdl != NULL && Hdl != INVALID_HANDLE)
     {
         FileEnumerator* fEnum = (FileEnumerator*) Hdl;
         delete fEnum;
@@ -162,7 +165,8 @@ BOOL FsDisconnect(char *DisconnectRoot)
 
 void FsSetDefaultParams(FsDefaultParamStruct* dps)
 {
-    LOGGING("FsSetDefaultParams");
+    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi,
+            dps->PluginInterfaceVersionLow, dps->size);
 }
 
 void FsGetDefRootName(char* DefRootName, int maxlen)

@@ -68,6 +68,8 @@ int HDFSAccessor::initialize()
         env->DeleteLocalRef(wfxPairObj);
         env->DeleteLocalRef(wfxPairClass);
         return 0;
+    }else{
+        assert(false);
     }
     return -1;
 }
