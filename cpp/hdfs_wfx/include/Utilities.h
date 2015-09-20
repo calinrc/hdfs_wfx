@@ -56,14 +56,19 @@ public:
         return getAbsolutePath(PLUGIN_LOCATION, retPath, size);
     }
 
-    static char* getLoggerDir(char* retPath, size_t* size)
+    static char* getLogDir(char* retPath, size_t* size)
     {
         return getAbsolutePath(LOG_PATH, retPath, size);
     }
 
-    static char* getLoggerFilePath(char* retPath, size_t* size)
+    static char* getLogFilePath(char* retPath, size_t* size)
     {
         return getAbsolutePath(FULL_LOG_PATH, retPath, size);
+    }
+
+    static char* getJavaLoggerFileLocation(char* retPath, size_t* size)
+    {
+        return getAbsolutePath(LOGGER_LOCATION, retPath, size);
     }
 
     static char* getJavaClasspathDir(char* retPath, size_t* size)

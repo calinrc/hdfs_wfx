@@ -49,7 +49,7 @@ int HDFSAccessor::initialize()
         s_WfxPairMetIdConstructor = env->GetMethodID(wfxPairClass, "<init>", "()V");
         assert(s_WfxPairMetIdConstructor != NULL);
 
-        s_WfxPairMetIdInitFS = env->GetMethodID(wfxPairClass, "initFS", "()I");
+        s_WfxPairMetIdInitFS = env->GetMethodID(wfxPairClass, "initFS", "()V");
         assert(s_WfxPairMetIdInitFS != NULL);
 
         s_WfxPairMetIdGetFolderContent = env->GetMethodID(wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
@@ -62,12 +62,16 @@ int HDFSAccessor::initialize()
         jobject wfxPairObj = env->NewObject(wfxPairClass, s_WfxPairMetIdConstructor);
         assert(wfxPairObj != NULL);
         m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
-        jint result = env->CallIntMethod(m_wfxPairObj, s_WfxPairMetIdInitFS);
-        assert(result != 0);
+        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdInitFS);
+        if (JVMState::instance()->exceptionExists(env))
+        {
+            assert(false);
+        }
         initFileEnumerator(env);
 
         env->DeleteLocalRef(wfxPairObj);
         env->DeleteLocalRef(wfxPairClass);
+
         return 0;
     } else
     {
@@ -79,17 +83,22 @@ int HDFSAccessor::initialize()
 void HDFSAccessor::initFileEnumerator(JNIEnv* env)
 {
     jclass wfxFileInformationClass = static_cast<jclass>(env->FindClass("hdfs_wfx_java/FileInformation"));
-    assert(wfxFileInformationClass != NULL);
-    s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()I");
-    assert(s_FileInfoGetFileAttributes != NULL);
-    s_FileInfoGetFileCreationTime = env->GetMethodID(wfxFileInformationClass, "getFileCreationTime", "()J");
-    assert(s_FileInfoGetFileCreationTime != NULL);
-    s_FileInfoGetFileLastAccessTime = env->GetMethodID(wfxFileInformationClass, "getFileLastAccessTime", "()J");
-    assert(s_FileInfoGetFileLastAccessTime != NULL);
-    s_FileInfoGetFileSize = env->GetMethodID(wfxFileInformationClass, "getFileSize", "()J");
-    assert(s_FileInfoGetFileSize != NULL);
-    s_FileInfoGetReserved0 = env->GetMethodID(wfxFileInformationClass, "getReserved0", "()I");
-    assert(s_FileInfoGetReserved0 != NULL);
+    if (!JVMState::instance()->exceptionExists(env))
+    {
+        s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()I");
+        assert(s_FileInfoGetFileAttributes != NULL);
+        s_FileInfoGetFileCreationTime = env->GetMethodID(wfxFileInformationClass, "getFileCreationTime", "()J");
+        assert(s_FileInfoGetFileCreationTime != NULL);
+        s_FileInfoGetFileLastAccessTime = env->GetMethodID(wfxFileInformationClass, "getFileLastAccessTime", "()J");
+        assert(s_FileInfoGetFileLastAccessTime != NULL);
+        s_FileInfoGetFileSize = env->GetMethodID(wfxFileInformationClass, "getFileSize", "()J");
+        assert(s_FileInfoGetFileSize != NULL);
+        s_FileInfoGetReserved0 = env->GetMethodID(wfxFileInformationClass, "getReserved0", "()I");
+        assert(s_FileInfoGetReserved0 != NULL);
+    } else
+    {
+        assert(false);
+    }
 }
 
 void HDFSAccessor::release()
@@ -110,24 +119,27 @@ FileEnumerator* HDFSAccessor::getFolderContent(char* path)
     {
         jstring pathStr = env->NewStringUTF(path);
         jobjectArray contentArray = static_cast<jobjectArray>(env->CallObjectMethod(m_wfxPairObj, s_WfxPairMetIdGetFolderContent, pathStr));
-        env->DeleteLocalRef(pathStr);
-        if (contentArray != NULL)
+        if (!JVMState::instance()->exceptionExists(env))
         {
-            set<string> contentItems;
-            jsize len = env->GetArrayLength(contentArray);
-            for (jsize i = 0; i < len; i++)
+            env->DeleteLocalRef(pathStr);
+            if (contentArray != NULL)
             {
-                jstring elem = static_cast<jstring>(env->GetObjectArrayElement(contentArray, i));
-                if (elem != NULL)
+                set<string> contentItems;
+                jsize len = env->GetArrayLength(contentArray);
+                for (jsize i = 0; i < len; i++)
                 {
-                    const char *str = env->GetStringUTFChars(elem, NULL);
-                    string item(str);
-                    contentItems.insert(item);
-                    env->ReleaseStringUTFChars(elem, str);
+                    jstring elem = static_cast<jstring>(env->GetObjectArrayElement(contentArray, i));
+                    if (elem != NULL)
+                    {
+                        const char *str = env->GetStringUTFChars(elem, NULL);
+                        string item(str);
+                        contentItems.insert(item);
+                        env->ReleaseStringUTFChars(elem, str);
+                    }
                 }
+                string pathStr(path);
+                return new FileEnumerator(env, m_wfxPairObj, pathStr, contentItems);
             }
-            string pathStr(path);
-            return new FileEnumerator(env, m_wfxPairObj, pathStr, contentItems);
         }
     }
     return NULL;

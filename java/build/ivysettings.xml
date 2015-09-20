@@ -1,13 +1,15 @@
 <ivysettings>
-    <settings defaultResolver="central" defaultConflictManager="all" circularDependencyStrategy="error" />
-    <caches  useOrigin="true" artifactPattern="[organisation]/[module]/[artifact].[ext]"/>
+    <settings defaultResolver="chain" defaultConflictManager="all" circularDependencyStrategy="error" />
+    <caches  useOrigin="true" artifactPattern="[organisation]/[module]/[artifact].[ext]" defaultCacheDir="${user.home}/.ivy2/wfx_repo_cache" />
     <resolvers>
         <ibiblio name="central" m2compatible="true"/>
-        <!--
         <filesystem name="local">
             <ivy pattern="${ivy.default.ivy.user.dir}/wfx_repo/[organisation]/[module]/[revision]/ivy/ivy.xml" />
             <artifact pattern="${ivy.default.ivy.user.dir}/wfx_repo/[organisation]/[module]/[revision]/[type]/[artifact].[ext]" />
         </filesystem>
-        -->
-    </resolvers>
+        <chain name="chain" returnFirst="true">
+            <resolver ref="local" />
+            <resolver ref="central" />
+        </chain>
+</resolvers>
 </ivysettings>

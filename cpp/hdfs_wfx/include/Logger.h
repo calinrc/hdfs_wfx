@@ -17,6 +17,7 @@
 #include "gendef.h"
 #include "wfxplugin.h"
 
+
 class Logger
 {
 
@@ -40,6 +41,7 @@ private:
     FILE* m_file;
     tLogProc m_externalLogger;
     int m_pluginNo;
+
     static Logger* s_instance;
 };
 

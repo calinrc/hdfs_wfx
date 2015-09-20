@@ -19,12 +19,13 @@
 
 #define PLUGIN_LOCATION PLUGINS_LOCATION "/hdfs_wfx"
 #define LOG_PATH PLUGIN_LOCATION "/logs"
-#define LOG_FILE_NAME "/hdfs_wfx.log"
-
+#define LOGGER_LOCATION PLUGIN_LOCATION "/log4j.xml"
 #define JAVA_CLASSPATH_VAL PLUGIN_LOCATION "/java"
+#define FULL_LOG_PATH LOG_PATH "/hdfs_wfx.log"
 
+#define PATH_SEPARATOR ":"
+#define FILE_SEPARATOR "/"
 
-#define FULL_LOG_PATH LOG_PATH LOG_FILE_NAME
 #define MAX_PATH 260
 
 

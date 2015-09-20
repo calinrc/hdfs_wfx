@@ -1,0 +1,14 @@
+<ivy-module version="1.0">
+  <info organisation="hdfs_wfx" module="hdfs_wfx_java_test" status="integration" />
+  <configurations>
+    <conf name="build" />
+  </configurations>
+
+  <publications>
+    <artifact name="hdfs_wfx_test" type="jar" ext="jar" />
+  </publications>
+
+  <dependencies>
+    <dependency org="hdfs_wfx" name="hdfs_wfx_java" rev="0.1" conf="build->build" />
+  </dependencies> 
+</ivy-module>

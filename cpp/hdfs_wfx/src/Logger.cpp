@@ -60,9 +60,9 @@ void Logger::init(bool consoleEnable, bool fileEnable)
         pathSize = MAX_PATH;
         Utilities::mkDirectory(Utilities::getPluginDir(logPath, &pathSize));
         pathSize = MAX_PATH;
-        Utilities::mkDirectory(Utilities::getLoggerDir(logPath, &pathSize));
+        Utilities::mkDirectory(Utilities::getLogDir(logPath, &pathSize));
         pathSize = MAX_PATH;
-        Utilities::getLoggerFilePath(logPath, &pathSize);
+        Utilities::getLogFilePath(logPath, &pathSize);
 
         m_file = fopen(logPath, "a");
     }
@@ -90,14 +90,12 @@ void Logger::log(const char* msg, ...)
         char * displayMsg = buildMessage(msg, args);
         if (m_isFileLoggingEnabled)
         {
-            fprintf(m_file, "%s", displayMsg);
-            fprintf(m_file, "\n");
+            fprintf(m_file, "%s\n", displayMsg);
             fflush(m_file);
         }
         if (m_isConsoleLoggingEnabled)
         {
-            fprintf(stdout, "%s", displayMsg);
-            fprintf(stdout, "\n");
+            fprintf(stdout, "%s\n", displayMsg);
 
         }
         if (m_externalLogger != NULL)
@@ -111,7 +109,7 @@ void Logger::log(const char* msg, ...)
 
 char* Logger::buildMessage(const char* msg, va_list argList)
 {
-    int len = 0, count = 300;
+    int len = 0, count = 300000;
     char* buff = new char[count];
     char * cBuff = new char[count];
 

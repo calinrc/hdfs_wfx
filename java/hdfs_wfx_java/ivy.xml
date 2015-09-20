@@ -9,10 +9,9 @@
   </publications>
 
   <dependencies>
-    <dependency org="org.apache.hadoop" name="hadoop-common" rev="${hadoop.version}"  conf="build->default" transitive="false"/>
-    <dependency org="org.apache.hadoop" name="hadoop-client" rev="${hadoop.version}" conf="build->default" transitive="false"/>
-    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="${hadoop.version}" conf="build->default" transitive="false"/>
-    <dependency org="log4j" name="log4j" rev="1.2.16" conf="build->default" transitive="false"/>
+    <dependency org="org.apache.hadoop" name="hadoop-common" rev="${hadoop.version}"  conf="build->default" />
+    <dependency org="org.apache.hadoop" name="hadoop-client" rev="${hadoop.version}" conf="build->default" />
+    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="${hadoop.version}" conf="build->default" />
     
   </dependencies> 
 </ivy-module>

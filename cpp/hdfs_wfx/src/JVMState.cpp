@@ -16,7 +16,10 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <string.h>
+#include "Utilities.h"
 
 JVMState* JVMState::s_instance = new JVMState();
 
@@ -39,11 +42,31 @@ JVMStateEnum JVMState::initialize(const char* javaclasspathDir)
 
         LOGGING("Start creating JVM");
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
-        JavaVMOption* options = new JavaVMOption[1];
+        JavaVMOption* options = new JavaVMOption[2];
 
-        char classpath[2048];
-        sprintf(classpath, "-Djava.class.path=%s", javaclasspathDir);
-        options[0].optionString = classpath;
+        char classpathParam[206800];
+        char classpath[204800];
+        char log4j[MAX_PATH];
+        char log4jParam[MAX_PATH+100];
+
+        size_t pathSize = MAX_PATH;
+
+
+        memset(classpathParam, 0, sizeof(classpathParam));
+        memset(classpath, 0, sizeof(classpath));
+        memset(log4j, 0, sizeof(log4j));
+
+        buildClassPath(javaclasspathDir, classpath, sizeof(classpath));
+        LOGGING("Using classpath: %s", classpath);
+        sprintf(classpathParam, "-Djava.class.path=%s", classpath);
+
+        Utilities::getJavaLoggerFileLocation(log4j, &pathSize);
+        sprintf(log4jParam, "-Dlog4j.configuration=file://%s", log4j);
+
+
+
+        options[0].optionString = classpathParam;
+        options[1].optionString = log4jParam;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.nOptions = 1;
         vm_args.options = options;
@@ -159,6 +182,35 @@ bool JVMState::exceptionExists(JNIEnv* env)
         env->ExceptionClear();
     }
     return exceptionExists;
+}
+
+void JVMState::buildClassPath(const char* cJarsDir, char* classpath, size_t classpathsize)
+{
+    dirent* dp = NULL;
+    bool isFirst = true;
+    size_t totalSizeWritten = 0;
+    size_t cpFOlderSize = strlen(cJarsDir);
+
+    DIR* dirp = opendir(cJarsDir);
+    while ((dp = readdir(dirp)) != NULL)
+    {
+        size_t itemSize = strlen(dp->d_name);
+        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0
+                && (totalSizeWritten + sizeof(PATH_SEPARATOR) + cpFOlderSize + sizeof(FILE_SEPARATOR) + itemSize + 1) < classpathsize)
+        {
+            if (!isFirst)
+            {
+                strcat(classpath, PATH_SEPARATOR);
+                itemSize += sizeof(PATH_SEPARATOR);
+            }
+            isFirst = false;
+            strcat(classpath, cJarsDir);
+            strcat(classpath, FILE_SEPARATOR);
+            strcat(classpath, dp->d_name);
+            totalSizeWritten += cpFOlderSize + sizeof(FILE_SEPARATOR) + itemSize;
+        }
+    }
+    (void) closedir(dirp);
 }
 
 JVMState* JVMState::instance()

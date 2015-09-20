@@ -46,7 +46,7 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 {
     gProgressProc = pProgressProc;
     gRequestProc = pRequestProc;
-    Logger::getInstance()->init(false, true, pLogProc, PluginNr);
+    Logger::getInstance()->init(true, true, pLogProc, PluginNr);
     LOGGING("FSInit");
 
     char logPath[MAX_PATH];
@@ -171,7 +171,7 @@ void FsSetDefaultParams(FsDefaultParamStruct* dps)
 
 void FsGetDefRootName(char* DefRootName, int maxlen)
 {
-    Logger::getInstance()->init(false, true);
+    Logger::getInstance()->init(true, true);
     LOGGING("FsGetDefRootName");
     strncpy(DefRootName, "HDFS", maxlen);
 }

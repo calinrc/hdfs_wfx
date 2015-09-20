@@ -1,0 +1,39 @@
+<project name="defs" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:jacoco="antlib:org.jacoco.ant">
+	<property file="../build/build.properties" />
+
+	<target name="init">
+		<ivy:settings file="../build/ivysettings.xml" />
+	</target>
+
+	<target name="deploy">
+		<ivy:publish artifactspattern="../build/target/${ant.project.name}/[artifact].[ext]" resolver="local" pubrevision="0.1" status="integration" update="true" overwrite="true" />
+	</target>
+
+	<target name="clean" depends="init">
+		<delete dir="${basedir}/lib" />
+		<delete dir="${basedir}/../build/target/${ant.project.name}" />
+		<ivy:cleancache />
+	</target>
+
+	<target name="retrieve" depends="init">
+		<ivy:retrieve />
+	</target>
+
+
+	<target name="build" depends="retrieve, compile, pack, deploy" />
+
+	<target name="compile">
+		<mkdir dir="${basedir}/../build/target/${ant.project.name}/bin" />
+		<javac srcdir="${basedir}/src/main/java" destdir="${basedir}/../build/target/${ant.project.name}/bin" target="1.7">
+			<classpath>
+				<fileset dir="${basedir}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="pack">
+		<jar destfile="../build/target/${ant.project.name}/${artifact.name}" basedir="${basedir}/../build/target/${ant.project.name}/bin" />
+	</target>
+ </project>
