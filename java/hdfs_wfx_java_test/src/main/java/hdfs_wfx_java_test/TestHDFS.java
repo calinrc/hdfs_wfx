@@ -1,12 +1,15 @@
 package hdfs_wfx_java_test;
 
-import hdfs_wfx_java.WfxPair;
+import org.cgc.wfx.FSClientLauncher;
+import org.cgc.wfx.WfxPair;
 
 public class TestHDFS {
 
 	public static void main(String[] args) {
 		try {
-			WfxPair pair = new WfxPair();
+			String path = System.getProperty("user.home");
+			
+			WfxPair pair = FSClientLauncher.getPairInstance(path + "/.config/doublecmd/plugins/hdfs_wfx/java/deps ");
 			System.out.println("Init");
 			pair.initFS();
 			String[] content = pair.getFolderContent("/");

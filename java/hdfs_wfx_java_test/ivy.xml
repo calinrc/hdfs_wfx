@@ -10,5 +10,6 @@
 
   <dependencies>
     <dependency org="hdfs_wfx" name="hdfs_wfx_java" rev="0.1" conf="build->build" />
+    <dependency org="hdfs_wfx" name="wfx_launcher" rev="0.1" conf="build->build" />
   </dependencies> 
 </ivy-module>

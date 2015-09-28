@@ -1,10 +1,11 @@
-package hdfs_wfx_java;
+package org.cgc.wfx.impl;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.cgc.wfx.FileInformation;
 
-public class FileInformation {
+public class FileInformationImpl implements FileInformation{
 	private static final long FILE_ATTRIBUTE_UNIX_MODE = 0x80000000;
 	private static final long FILE_ATTRIBUTE_DIRECTORY = 16;
 
@@ -30,7 +31,7 @@ public class FileInformation {
 	private int reserved0;
 	private String fileName;
 
-	public FileInformation(FileStatus fstatus) {
+	public FileInformationImpl(FileStatus fstatus) {
 		boolean isDir = fstatus.isDirectory();
 
 		this.fileAttributes |= FILE_ATTRIBUTE_UNIX_MODE;

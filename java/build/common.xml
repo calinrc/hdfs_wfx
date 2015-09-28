@@ -16,6 +16,7 @@
 	</target>
 
 	<target name="retrieve" depends="init">
+		<mkdir dir="${basedir}/lib"/>
 		<ivy:retrieve />
 	</target>
 

@@ -1,0 +1,13 @@
+<ivy-module version="1.0">
+  <info organisation="hdfs_wfx" module="wfx_launcher" status="integration" />
+  <configurations>
+    <conf name="build" />
+  </configurations>
+
+  <publications>
+    <artifact name="wfx_launcher" type="jar" ext="jar" />
+  </publications>
+
+  <dependencies>
+  </dependencies>
+</ivy-module>

@@ -1,0 +1,4 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="wfx_launcher">
+	<property name="artifact.name" value="wfx_launcher.jar" />
+	<import file="../build/common.xml" />
+</project>

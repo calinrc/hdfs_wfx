@@ -9,6 +9,7 @@
   </publications>
 
   <dependencies>
+  <dependency org="hdfs_wfx" name="wfx_launcher" rev="0.1"  conf="build->build" />
     <dependency org="org.apache.hadoop" name="hadoop-common" rev="${hadoop.version}"  conf="build->default" />
     <dependency org="org.apache.hadoop" name="hadoop-client" rev="${hadoop.version}" conf="build->default" />
     <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="${hadoop.version}" conf="build->default" />

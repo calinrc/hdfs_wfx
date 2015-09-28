@@ -1,4 +1,4 @@
-package hdfs_wfx_java.exception;
+package org.cgc.wfx.exception;
 
 public class WfxHdfsException extends RuntimeException {
 

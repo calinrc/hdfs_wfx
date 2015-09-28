@@ -1,6 +1,4 @@
-package hdfs_wfx_java;
-
-import hdfs_wfx_java.exception.WfxHdfsException;
+package org.cgc.wfx.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +11,12 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.cgc.wfx.FileInformation;
+import org.cgc.wfx.WfxPair;
+import org.cgc.wfx.exception.WfxHdfsException;
 
-public class FileSystemProxy {
-	private static final Logger log = Logger.getLogger(WfxPair.class);
+public class FileSystemProxy implements WfxPair {
+	private static final Logger log = Logger.getLogger(FileSystemProxy.class);
 	private FileSystem fileSystem;
 
 	public FileSystemProxy() {
@@ -51,7 +52,7 @@ public class FileSystemProxy {
 			log.debug("End Initialize FS");
 		}
 	}
-	
+
 	/**
 	 * @param folderPath
 	 * @return String[]
@@ -84,12 +85,12 @@ public class FileSystemProxy {
 		try {
 			FileStatus fstatus = this.fileSystem.getFileStatus(new Path(
 					parentFolder + "/" + fileName));
-			return new FileInformation(fstatus);
+			return new FileInformationImpl(fstatus);
 		} catch (IOException ioEx) {
 			log.error("FAIL on getting file info for " + parentFolder + "/"
 					+ fileName, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}
-	
+
 }

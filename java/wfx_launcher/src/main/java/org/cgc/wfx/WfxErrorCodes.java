@@ -1,4 +1,4 @@
-package hdfs_wfx_java;
+package org.cgc.wfx;
 
 public enum WfxErrorCodes {
 	OK, InitializationError, FileEnumerationError, ReadError, WriteError, CloseError, MoveError
