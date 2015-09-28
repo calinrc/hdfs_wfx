@@ -35,7 +35,7 @@ private:
     JVMState();
     virtual ~JVMState();
 
-    void buildClassPath(const char* cJarsDir, char* classpath, size_t classpathsize);
+    void buildClassPath(const char* cJarsDir, char* classpath, size_t* classpathsize);
 
     static JVMState* s_instance;
     bool m_initialized;

@@ -33,7 +33,6 @@ bool FileEnumerator::getNext(WIN32_FIND_DATAA *FindData)
     bool hasContent = m_it != m_content.end();
     if (hasContent)
     {
-        ++m_it;
         string item = *m_it;
         JNIEnv* env = JVMState::instance()->getEnv();
         jobject fileInfoObj = getFileInfo(env, m_parent, item);
@@ -41,11 +40,8 @@ bool FileEnumerator::getNext(WIN32_FIND_DATAA *FindData)
         {
             getFileInfoContent(env, fileInfoObj, item, FindData);
             env->DeleteLocalRef(fileInfoObj);
-        } else
-        {
-            hasContent = false;
         }
-
+        ++m_it;
     }
     return hasContent;
 }

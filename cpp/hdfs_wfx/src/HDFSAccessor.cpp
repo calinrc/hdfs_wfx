@@ -60,10 +60,15 @@ int HDFSAccessor::initialize()
         assert(s_WfxPairMetIdGetFileInfo != NULL);
 
         jobject wfxPairObj = env->NewObject(wfxPairClass, s_WfxPairMetIdConstructor);
-        assert(wfxPairObj != NULL);
-        m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
-        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdInitFS);
-        if (JVMState::instance()->exceptionExists(env))
+        if (!JVMState::instance()->exceptionExists(env))
+        {
+            m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
+            env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdInitFS);
+            if (JVMState::instance()->exceptionExists(env))
+            {
+                assert(false);
+            }
+        } else
         {
             assert(false);
         }
