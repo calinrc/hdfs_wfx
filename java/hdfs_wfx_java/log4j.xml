@@ -24,7 +24,7 @@
     </layout>
   </appender>
 
-  <logger name="hdfs_wfx_java">
+  <logger name="org.cgc.wfx">
     <level value="DEBUG" />
     <appender-ref ref="console" />
     <appender-ref ref="hdfs_wfx_file" />

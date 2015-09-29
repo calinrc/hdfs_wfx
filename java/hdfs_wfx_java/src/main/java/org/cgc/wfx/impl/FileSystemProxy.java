@@ -11,6 +11,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.cgc.wfx.Constants;
 import org.cgc.wfx.FileInformation;
 import org.cgc.wfx.WfxPair;
 import org.cgc.wfx.exception.WfxHdfsException;
@@ -34,14 +35,14 @@ public class FileSystemProxy implements WfxPair {
 			for (String file : new String[] { "core-site.xml",
 					"mapred-site.xml", "hdfs-site.xml", "yarn-site.xml" }) {
 				URL url = new File(System.getProperty("user.home")
-						+ File.separatorChar
-						+ ".config/doublecmd/plugins/hdfs_wfx/java/" + file)
-						.toURI().toURL();
+						+ File.separatorChar + Constants.DEPENDENCIES_PATH
+						+ File.separatorChar + file).toURI().toURL();
 				if (url != null) {
 					config.addResource(url);
 				}
 
 			}
+			config.set("fs.defaultFS", "hdfs://ae-VirtualBox:9000");
 
 			FileSystem fileSystem = FileSystem.get(config);
 			this.fileSystem = fileSystem;

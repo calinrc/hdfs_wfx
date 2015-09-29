@@ -24,8 +24,9 @@
 	<target name="build" depends="retrieve, compile, pack, deploy" />
 
 	<target name="compile">
+	    <delete dir="${basedir}/../build/target/${ant.project.name}/bin"/>
 		<mkdir dir="${basedir}/../build/target/${ant.project.name}/bin" />
-		<javac srcdir="${basedir}/src/main/java" destdir="${basedir}/../build/target/${ant.project.name}/bin" target="1.7">
+		<javac srcdir="${basedir}/src/main/java" destdir="${basedir}/../build/target/${ant.project.name}/bin" target="1.7" debug="true" source="1.7">
 			<classpath>
 				<fileset dir="${basedir}/lib">
 					<include name="**/*.jar" />

@@ -34,8 +34,9 @@ public class DepsLoader {
 			} else {
 				urls.add(new File(folderPath).toURI().toURL());
 			}
-			URLClassLoader urlClassLoader = URLClassLoader.newInstance(urls
-					.toArray(new URL[urls.size()]));
+			URLClassLoader urlClassLoader = URLClassLoader
+					.newInstance(urls.toArray(new URL[urls.size()]), getClass()
+							.getClassLoader());
 
 			return urlClassLoader;
 		} catch (MalformedURLException ex) {

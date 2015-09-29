@@ -8,10 +8,13 @@ public class FSClientLauncher {
 		try {
 			DepsLoader loader = new DepsLoader(dependencyFolder);
 			ClassLoader cl = loader.loadFolder();
-			Class<?> pairClasss = cl.loadClass(PAIR_CLASS);
-			Object obj = pairClasss.newInstance();
-			if (obj instanceof WfxPair) {
-				return (WfxPair) obj;
+			if (cl != null) {
+				Thread.currentThread().setContextClassLoader(cl);
+				Class<?> pairClasss = cl.loadClass(PAIR_CLASS);
+				Object obj = pairClasss.newInstance();
+				if (obj instanceof WfxPair) {
+					return (WfxPair) obj;
+				}
 			}
 		} catch (ClassNotFoundException cnfEx) {
 			cnfEx.printStackTrace();
