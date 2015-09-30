@@ -8,6 +8,7 @@ public class FSClientLauncher {
 
 	public static WfxPair getPairInstance(String dependencyFolder) {
 		try {
+			System.out.println("Try getting WfxPair instance");
 			DepsLoader loader = new DepsLoader(dependencyFolder);
 			ClassLoader cl = loader.loadFolder();
 			if (cl != null) {
@@ -15,6 +16,7 @@ public class FSClientLauncher {
 				Class<?> pairClasss = cl.loadClass(PAIR_CLASS);
 				Object obj = pairClasss.newInstance();
 				if (obj instanceof WfxPair) {
+					System.out.println("WfxPair instance obtained");
 					return (WfxPair) obj;
 				}
 			} else {
