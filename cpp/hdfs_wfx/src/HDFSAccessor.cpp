@@ -13,12 +13,14 @@
 #include <HDFSAccessor.h>
 #include "gendef.h"
 #include "JVMState.h"
+#include "Utilities.h"
+#include "Logger.h"
 #include <assert.h>
 #include <string>
+#include <string.h>
 #include <set>
 
 HDFSAccessor* HDFSAccessor::s_instance = new HDFSAccessor();
-jmethodID HDFSAccessor::s_WfxPairMetIdConstructor = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdInitFS = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdGetFolderContent = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdGetFileInfo = NULL;
@@ -42,12 +44,26 @@ HDFSAccessor::~HDFSAccessor()
 
 int HDFSAccessor::initialize()
 {
+    char dependenciesPath[MAX_PATH];
+    size_t pathSize = MAX_PATH;
+    memset(dependenciesPath, 0, sizeof(dependenciesPath));
+
     JNIEnv* env = JVMState::instance()->getEnv();
-    jclass wfxPairClass = static_cast<jclass>(env->FindClass("hdfs_wfx_java/WfxPair"));
+    Utilities::getJavaDependenciesPath(dependenciesPath, &pathSize);
+
+    jclass wfxLauncherClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/FSClientLauncher"));
+    if (JVMState::instance()->exceptionExists(env) || wfxLauncherClass == NULL)
+    {
+        LOGGING("Unable to find Java launcher jar %s", JAVA_LAUNCHER_VAL)
+        assert(false);
+    }
+    jstring depsPathStr = env->NewStringUTF(dependenciesPath);
+    jmethodID getPairInstanceMethodId = env->GetStaticMethodID(wfxLauncherClass, "getPairInstance", "(Ljava/lang/String;)Lorg/cgc/wfx/WfxPair;");
+    assert(getPairInstanceMethodId != NULL);
+
+    jclass wfxPairClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/WfxPair"));
     if (!JVMState::instance()->exceptionExists(env))
     {
-        s_WfxPairMetIdConstructor = env->GetMethodID(wfxPairClass, "<init>", "()V");
-        assert(s_WfxPairMetIdConstructor != NULL);
 
         s_WfxPairMetIdInitFS = env->GetMethodID(wfxPairClass, "initFS", "()V");
         assert(s_WfxPairMetIdInitFS != NULL);
@@ -55,11 +71,13 @@ int HDFSAccessor::initialize()
         s_WfxPairMetIdGetFolderContent = env->GetMethodID(wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
         assert(s_WfxPairMetIdGetFolderContent != NULL);
 
-        s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation",
-                                                     "(Ljava/lang/String;Ljava/lang/String;)Lhdfs_wfx_java/FileInformation;");
+        s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation", "(Ljava/lang/String;Ljava/lang/String;)Lorg/cgc/wfx/FileInformation;");
         assert(s_WfxPairMetIdGetFileInfo != NULL);
 
-        jobject wfxPairObj = env->NewObject(wfxPairClass, s_WfxPairMetIdConstructor);
+        initFileEnumerator(env);
+
+        jobject wfxPairObj = env->CallStaticObjectMethod(wfxLauncherClass, getPairInstanceMethodId, depsPathStr);
+
         if (!JVMState::instance()->exceptionExists(env))
         {
             m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
@@ -70,16 +88,18 @@ int HDFSAccessor::initialize()
             }
         } else
         {
+            LOGGING("Fail on obtaining WfxPair instance. Please check the existence of hdfs_wfx.jar inside of ~/.config/doublecmd/plugins/hdfs_wfx/java/deps/ folder")
             assert(false);
         }
-        initFileEnumerator(env);
-
+        env->DeleteLocalRef(depsPathStr);
         env->DeleteLocalRef(wfxPairObj);
         env->DeleteLocalRef(wfxPairClass);
+        env->DeleteLocalRef(wfxLauncherClass);
 
         return 0;
     } else
     {
+        LOGGING("Unable to find Java launcher jar %s and its WfxPair class", JAVA_LAUNCHER_VAL)
         assert(false);
     }
     return -1;
@@ -87,7 +107,7 @@ int HDFSAccessor::initialize()
 
 void HDFSAccessor::initFileEnumerator(JNIEnv* env)
 {
-    jclass wfxFileInformationClass = static_cast<jclass>(env->FindClass("hdfs_wfx_java/FileInformation"));
+    jclass wfxFileInformationClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/FileInformation"));
     if (!JVMState::instance()->exceptionExists(env))
     {
         s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()I");

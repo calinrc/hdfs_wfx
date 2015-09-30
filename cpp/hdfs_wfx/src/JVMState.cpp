@@ -20,6 +20,7 @@
 #include <dirent.h>
 #include <string.h>
 #include "Utilities.h"
+#include <assert.h>
 
 JVMState* JVMState::s_instance = new JVMState();
 
@@ -33,7 +34,7 @@ JVMState::~JVMState()
 {
 }
 
-JVMStateEnum JVMState::initialize(const char* javaclasspathDir)
+JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
 {
 
     JVMStateEnum retVal = JVMLoadFail;
@@ -44,27 +45,24 @@ JVMStateEnum JVMState::initialize(const char* javaclasspathDir)
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
         JavaVMOption* options = new JavaVMOption[2];
 
-        size_t classpahParamsSize = 206800;
-        char* classpathParam = new char[classpahParamsSize];
-        char* classpath = new char[classpahParamsSize];
-        char log4j[MAX_PATH];
+        char classpathParam[MAX_PATH + 100];
+        char log4j[MAX_PATH + 100];
         char log4jParam[MAX_PATH + 100];
 
         size_t pathSize = MAX_PATH;
 
-        memset(classpathParam, 0, sizeof(char) * classpahParamsSize);
-        memset(classpath, 0, sizeof(char) * classpahParamsSize);
+        memset(classpathParam, 0, sizeof(classpathParam));
         memset(log4j, 0, sizeof(log4j));
+        memset(log4jParam, 0, sizeof(log4jParam));
 
-        buildClassPath(javaclasspathDir, classpath, &classpahParamsSize);
-        sprintf(classpathParam, "-classpath %s", classpath);
+        sprintf(classpathParam, "-Djava.class.path=%s", javaLauncherJar);
 
         Utilities::getJavaLoggerFileLocation(log4j, &pathSize);
         sprintf(log4jParam, "-Dlog4j.configuration=file://%s", log4j);
 
-        LOGGING("Using classpath: size %d %d  <-> %s ", strlen(classpathParam), classpahParamsSize, classpathParam);
+        LOGGING("Using classpath param:  \"%s\" ", classpathParam);
 
-        LOGGING("Using log4j.configuration: size %d  <-> %s ", pathSize, log4jParam);
+        LOGGING("Using log4j.configuration param \"%s\"", log4jParam);
 
         options[0].optionString = classpathParam;
         options[0].extraInfo = 0;
@@ -75,87 +73,88 @@ JVMStateEnum JVMState::initialize(const char* javaclasspathDir)
         vm_args.nOptions = 1;
         vm_args.options = options;
         vm_args.ignoreUnrecognized = false;
-
-        JNIEnv* env;
-        jint jvmCreateState = JNI_CreateJavaVM(&m_jvm, (void**) &env, &vm_args);
-
-        if (jvmCreateState == JNI_OK)
-        {
-            LOGGING("JVM create OK");
-            m_initialized = true;
-            retVal = JVMLoaded;
-        }else{
-            LOGGING("Fail to create JVM. Exit with code %d", jvmCreateState)
-        }
-
-        LOGGING("End JVM creation");
-        /* load and initialize a Java VM, return a JNI interface
-         * pointer in env */
         /*
-         char* javaHomeFolder = getenv("JAVA_HOME");
-         if (javaHomeFolder != NULL)
-         {
-         char path[MAX_PATH] = { 0 };
-
-         sprintf(path, "%s/jre/lib/amd64/server/libjvm.so", javaHomeFolder);
-
-         bool foundJvm = false;
-
-         struct stat st = { 0 };
-
-         if (stat(path, &st) == -1)
-         {
-         LOGGING("Unable to find jvm dynamic library in %s", path);
-         sprintf(path, "%s/jre/lib/amd64/default/libjvm.so", javaHomeFolder);
-         if (stat(path, &st) == -1)
-         {
-         LOGGING("Unable to find jvm dynamic library in %s", path);
-         } else
-         {
-         foundJvm = true;
-         }
-
-         } else
-         {
-         //found in default Oracle, OpenJDK places
-         foundJvm = true;
-         }
-         if (foundJvm)
-         {
-         LOGGING("Try loading JVM dynamic library...");
-         m_handle = dlopen(path, RTLD_DEEPBIND);
-
-         if (m_handle != NULL)
-         {
-
-         LOGGING("Try creating JVM");
-         JNI_CreateJavaVM_func JNI_CreateJavaVM_loc;
-         JNI_CreateJavaVM_loc = (JNI_CreateJavaVM_func) dlsym(m_handle, "JNI_CreateJavaVM");
-
          JNIEnv* env;
-         jint jvmCreateState = JNI_CreateJavaVM_loc(&m_jvm, (void**) &env, &vm_args);
+         jint jvmCreateState = JNI_CreateJavaVM(&m_jvm, (void**) &env, &vm_args);
 
          if (jvmCreateState == JNI_OK)
          {
          LOGGING("JVM create OK");
          m_initialized = true;
+         retVal = JVMLoaded;
+         }else{
+         LOGGING("Fail to create JVM. Exit with code %d", jvmCreateState)
          }
 
          LOGGING("End JVM creation");
-         retVal = JVMLoaded;
-         } else
-         {
-         LOGGING("JVM loading error %s", dlerror());
-         }
-         }
-
-         } else
-         {
-         LOGGING("Unable to find JAVA_HOME variable");
-         }
          */
-        delete[] classpathParam;
-        delete[] classpath;
+        /* load and initialize a Java VM, return a JNI interface
+         * pointer in env */
+
+        char* javaHomeFolder = getenv("JAVA_HOME");
+        if (javaHomeFolder != NULL)
+        {
+            char path[MAX_PATH] = { 0 };
+
+            sprintf(path, "%s/jre/lib/amd64/server/libjvm.so", javaHomeFolder);
+
+            bool foundJvm = false;
+
+            struct stat st = { 0 };
+
+            if (stat(path, &st) == -1)
+            {
+                LOGGING("Unable to find jvm dynamic library in %s", path);
+                sprintf(path, "%s/jre/lib/amd64/default/libjvm.so", javaHomeFolder);
+                if (stat(path, &st) == -1)
+                {
+                    LOGGING("Unable to find jvm dynamic library in %s", path);
+                } else
+                {
+                    foundJvm = true;
+                }
+
+            } else
+            {
+                //found in default Oracle, OpenJDK places
+                foundJvm = true;
+            }
+            if (foundJvm)
+            {
+                LOGGING("Try loading JVM dynamic library...");
+                m_handle = dlopen(path, RTLD_LAZY);
+
+                if (m_handle != NULL)
+                {
+
+                    LOGGING("Try creating JVM");
+                    JNI_CreateJavaVM_func JNI_CreateJavaVM_loc;
+                    JNI_CreateJavaVM_loc = (JNI_CreateJavaVM_func) dlsym(m_handle, "JNI_CreateJavaVM");
+
+                    JNIEnv* env;
+                    jint jvmCreateState = JNI_CreateJavaVM_loc(&m_jvm, (void**) &env, &vm_args);
+
+                    if (jvmCreateState == JNI_OK)
+                    {
+                        LOGGING("JVM create OK");
+                        m_initialized = true;
+                    }
+
+                    LOGGING("End JVM creation");
+                    retVal = JVMLoaded;
+                } else
+                {
+                    LOGGING("JVM loading error %s", dlerror());
+                    assert(false);
+                }
+            }
+
+        } else
+        {
+            LOGGING("Unable to find JAVA_HOME variable");
+            assert(false);
+        }
+
         delete[] options;
 
     }
@@ -205,36 +204,6 @@ bool JVMState::exceptionExists(JNIEnv* env)
         env->ExceptionClear();
     }
     return exceptionExists;
-}
-
-void JVMState::buildClassPath(const char* cJarsDir, char* classpath, size_t* classpathsize)
-{
-    dirent* dp = NULL;
-    bool isFirst = true;
-    size_t totalSizeWritten = 0;
-    size_t cpFOlderSize = strlen(cJarsDir);
-
-    DIR* dirp = opendir(cJarsDir);
-    while ((dp = readdir(dirp)) != NULL)
-    {
-        size_t itemSize = strlen(dp->d_name);
-        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0
-                && (totalSizeWritten + cpFOlderSize + itemSize + 3) < *classpathsize)
-        {
-            if (!isFirst)
-            {
-                strcat(classpath, PATH_SEPARATOR);
-                itemSize++;
-            }
-            isFirst = false;
-            strcat(classpath, cJarsDir);
-            strcat(classpath, FILE_SEPARATOR);
-            strcat(classpath, dp->d_name);
-            totalSizeWritten += cpFOlderSize + 1 + itemSize;
-        }
-    }
-    (void) closedir(dirp);
-    *classpathsize = totalSizeWritten;
 }
 
 JVMState* JVMState::instance()

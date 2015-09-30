@@ -19,23 +19,19 @@
 
 #define PLUGIN_LOCATION PLUGINS_LOCATION "/hdfs_wfx"
 #define LOG_PATH PLUGIN_LOCATION "/logs"
-#define LOGGER_LOCATION PLUGIN_LOCATION "/log4j.xml"
-#define JAVA_CLASSPATH_VAL PLUGIN_LOCATION "/java"
-#define FULL_LOG_PATH LOG_PATH "/hdfs_wfx.log"
+#define JAVA_LAUNCHER_VAL PLUGIN_LOCATION "/java/wfx_launcher.jar"
+#define LOGGER_LOCATION PLUGIN_LOCATION "/java/log4j.xml"
+#define FULL_LOG_PATH PLUGIN_LOCATION "/logs/hdfs_wfx.log"
+#define DEPENDENCIES_PATH PLUGIN_LOCATION "/java/deps"
 
 #define PATH_SEPARATOR ":"
 #define FILE_SEPARATOR "/"
 
 #define MAX_PATH 260
 
-
-enum JVMStateEnum {
-
-    JVMLoaded,
-    JVMLoadFail,
-    JVMDetached,
-    JVMDetachFail
+enum JVMStateEnum
+{
+    JVMLoaded, JVMLoadFail, JVMDetached, JVMDetachFail
 };
-
 
 #endif /* INCLUDE_GENDEF_H_ */

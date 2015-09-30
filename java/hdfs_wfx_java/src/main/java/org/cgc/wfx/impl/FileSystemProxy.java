@@ -42,8 +42,6 @@ public class FileSystemProxy implements WfxPair {
 				}
 
 			}
-			config.set("fs.defaultFS", "hdfs://ae-VirtualBox:9000");
-
 			FileSystem fileSystem = FileSystem.get(config);
 			this.fileSystem = fileSystem;
 		} catch (Throwable ioEx) {
@@ -68,6 +66,7 @@ public class FileSystemProxy implements WfxPair {
 				for (FileStatus status : fstatuses) {
 					contentList.add(status.getPath().getName());
 				}
+				log.debug("Folder content is : "+contentList);
 				return contentList.toArray(new String[contentList.size()]);
 			} else {
 				return new String[0];

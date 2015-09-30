@@ -49,7 +49,7 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
     Logger::getInstance()->init(true, true, pLogProc, PluginNr);
     LOGGING("FSInit");
 
-    char logPath[MAX_PATH];
+    char javaLauncherPath[MAX_PATH];
     size_t pathSize = MAX_PATH;
 //    if (pRequestProc != NULL)
 //    {
@@ -58,7 +58,7 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 //        BOOL rv = pRequestProc(PluginNr, 3, "CustomTitle", "CustomText", returnedText, 100);
 //        LOGGING("requestProc val %d, message %s", rv, returnedText);
 //    }
-    JVMState::instance()->initialize(Utilities::getJavaClasspathDir(logPath, &pathSize));
+    JVMState::instance()->initialize(Utilities::getJavaLauncherPath(javaLauncherPath, &pathSize));
     int initialized = HDFSAccessor::instance()->initialize();
     LOGGING("HDFSAccesstor initialization done %d", initialized);
 

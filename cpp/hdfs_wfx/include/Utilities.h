@@ -71,9 +71,14 @@ public:
         return getAbsolutePath(LOGGER_LOCATION, retPath, size);
     }
 
-    static char* getJavaClasspathDir(char* retPath, size_t* size)
+    static char* getJavaLauncherPath(char* retPath, size_t* size)
     {
-        return getAbsolutePath(JAVA_CLASSPATH_VAL, retPath, size);
+        return getAbsolutePath(JAVA_LAUNCHER_VAL, retPath, size);
+    }
+
+    static char* getJavaDependenciesPath(char* retPath, size_t* size)
+    {
+        return getAbsolutePath(DEPENDENCIES_PATH, retPath, size);
     }
 
 private:
