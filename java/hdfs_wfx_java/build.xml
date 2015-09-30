@@ -1,4 +1,9 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="hdfs_wfx_java">
 	<property name="artifact.name" value="hdfs_wfx.jar" />
 	<import file="../build/common.xml" />
+	
+	<target name="deploy">
+		<mkdir dir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java/deps" />
+		<copy file="../build/target/${ant.project.name}/${artifact.name}" todir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java/deps" overwrite="true" />
+	</target>
 </project>

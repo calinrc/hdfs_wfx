@@ -1,4 +1,10 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="wfx_launcher">
 	<property name="artifact.name" value="wfx_launcher.jar" />
 	<import file="../build/common.xml" />
+
+	<target name="deploy">
+		<mkdir dir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java" />
+		<copy file="${basedir}/log4j.xml" todir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java" overwrite="true" />
+		<copy file="../build/target/${ant.project.name}/${artifact.name}" todir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java" overwrite="true" />
+	</target>
 </project>
