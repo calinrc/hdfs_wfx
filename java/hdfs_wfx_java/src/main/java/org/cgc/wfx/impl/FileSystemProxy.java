@@ -21,6 +21,8 @@ public class FileSystemProxy implements WfxPair {
 	private FileSystem fileSystem;
 
 	public FileSystemProxy() {
+		System.out.println("Calling FileSystemProxy constructor");
+		log.debug("WfxPair instance if  FileSystemProxy");
 	}
 
 	/**
