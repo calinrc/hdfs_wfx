@@ -61,9 +61,11 @@ int HDFSAccessor::initialize()
     jmethodID getPairInstanceMethodId = env->GetStaticMethodID(wfxLauncherClass, "getPairInstance", "(Ljava/lang/String;)Lorg/cgc/wfx/WfxPair;");
     assert(getPairInstanceMethodId != NULL);
 
-    jclass wfxPairClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/WfxPair"));
-    if (!JVMState::instance()->exceptionExists(env))
+    jobject wfxPairObj = env->CallStaticObjectMethod(wfxLauncherClass, getPairInstanceMethodId, depsPathStr);
+
+    if (!JVMState::instance()->exceptionExists(env) && wfxPairObj != NULL)
     {
+        jclass wfxPairClass = env->GetObjectClass(wfxPairObj);
 
         s_WfxPairMetIdInitFS = env->GetMethodID(wfxPairClass, "initFS", "()V");
         assert(s_WfxPairMetIdInitFS != NULL);
@@ -76,7 +78,6 @@ int HDFSAccessor::initialize()
 
         initFileEnumerator(env);
 
-        jobject wfxPairObj = env->CallStaticObjectMethod(wfxLauncherClass, getPairInstanceMethodId, depsPathStr);
 
         if (!JVMState::instance()->exceptionExists(env))
         {
