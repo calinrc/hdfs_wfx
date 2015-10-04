@@ -21,7 +21,6 @@ public class FileSystemProxy implements WfxPair {
 	private FileSystem fileSystem;
 
 	public FileSystemProxy() {
-		System.out.println("Calling FileSystemProxy constructor");
 		log.debug("WfxPair instance if  FileSystemProxy");
 	}
 
@@ -30,7 +29,6 @@ public class FileSystemProxy implements WfxPair {
 	 */
 	public void initFS() {
 		log.debug("Initialize FS");
-
 		try {
 			Configuration config = new Configuration();
 
@@ -68,7 +66,7 @@ public class FileSystemProxy implements WfxPair {
 				for (FileStatus status : fstatuses) {
 					contentList.add(status.getPath().getName());
 				}
-				log.debug("Folder content is : "+contentList);
+				log.debug("Folder content is : " + contentList);
 				return contentList.toArray(new String[contentList.size()]);
 			} else {
 				return new String[0];
@@ -80,14 +78,28 @@ public class FileSystemProxy implements WfxPair {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cgc.wfx.WfxPair#getFileInformation(java.lang.String, java.lang.String)
+	 */
 	public FileInformation getFileInformation(String parentFolder,
 			String fileName) {
-		log.debug("Try getting file informations for " + parentFolder + "/"
-				+ fileName);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(parentFolder);
+		if (!parentFolder.endsWith("/")) {
+			sb.append('/');
+		}
+		sb.append(fileName);
+
+		Path path = new Path(sb.toString());
+
+		log.debug("Try getting file informations for " + sb.toString());
 		try {
-			FileStatus fstatus = this.fileSystem.getFileStatus(new Path(
-					parentFolder + "/" + fileName));
-			return new FileInformationImpl(fstatus);
+
+			FileStatus fstatus = this.fileSystem.getFileStatus(path);
+			FileInformationImpl fileInformationImpl = new FileInformationImpl(fstatus);
+			log.debug("File details" + fileInformationImpl);
+			return fileInformationImpl;
 		} catch (IOException ioEx) {
 			log.error("FAIL on getting file info for " + parentFolder + "/"
 					+ fileName, ioEx);

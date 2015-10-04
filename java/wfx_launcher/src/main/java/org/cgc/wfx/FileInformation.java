@@ -5,7 +5,7 @@ public interface FileInformation {
 	/**
 	 * @return file attributes 
 	 */
-	int getFileAttributes();
+	long getFileAttributes();
 
 	/**
 	 * @return file creation time
@@ -25,7 +25,7 @@ public interface FileInformation {
 	/**
 	 * @return reserved file flags
 	 */
-	int getReserved0();
+	long getReserved0();
 
 	/**
 	 * @return fine name

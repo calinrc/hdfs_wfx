@@ -15,6 +15,8 @@
 #include <string.h>
 #include "JVMState.h"
 #include "common.h"
+#include <sys/stat.h>
+#include "Logger.h"
 
 FileEnumerator::FileEnumerator(JNIEnv* env, jobject wfxPairObj, string& parentPath, set<string>& content) :
         m_parent(parentPath), m_content(content), m_wfxPairObj(NULL)
@@ -74,7 +76,7 @@ void FileEnumerator::getFileInfoContent(JNIEnv* env, jobject fileInfoItem, strin
     memset(findData, 0, sizeof(WIN32_FIND_DATAA));
 
     strncpy(findData->cFileName, itemName.c_str(), MAX_PATH);
-    jint fileAttributes = env->CallIntMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileAttributes);
+    jlong fileAttributes = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileAttributes);
     findData->dwFileAttributes = fileAttributes;
     jlong fileCreationTime = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileCreationTime);
     findData->ftCreationTime.dwLowDateTime = (DWORD) fileCreationTime;
@@ -92,7 +94,7 @@ void FileEnumerator::getFileInfoContent(JNIEnv* env, jobject fileInfoItem, strin
     findData->nFileSizeLow = (DWORD) fileSize;
     findData->nFileSizeHigh = fileSize >> 32;
 
-    jint reserved0Val = env->CallIntMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetReserved0);
+    jlong reserved0Val = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetReserved0);
 
     findData->dwReserved0 = reserved0Val;
 

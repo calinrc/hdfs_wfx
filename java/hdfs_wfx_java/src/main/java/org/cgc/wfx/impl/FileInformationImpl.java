@@ -5,7 +5,7 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.cgc.wfx.FileInformation;
 
-public class FileInformationImpl implements FileInformation{
+public class FileInformationImpl implements FileInformation {
 	private static final long FILE_ATTRIBUTE_UNIX_MODE = 0x80000000;
 	private static final long FILE_ATTRIBUTE_DIRECTORY = 16;
 
@@ -24,16 +24,15 @@ public class FileInformationImpl implements FileInformation{
 	// private static int S_IWOTH = (S_IWGRP >> 3); /* Write by others. */
 	// private static int S_IXOTH = (S_IXGRP >> 3); /* Execute by others. */
 
-	private int fileAttributes;
+	private long fileAttributes;
 	private long fileCreationTime;
 	private long fileLastAccessTime;
 	private long fileSize;
-	private int reserved0;
+	private long reserved0;
 	private String fileName;
 
 	public FileInformationImpl(FileStatus fstatus) {
 		boolean isDir = fstatus.isDirectory();
-
 		this.fileAttributes |= FILE_ATTRIBUTE_UNIX_MODE;
 		if (isDir) {
 			this.fileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
@@ -49,7 +48,7 @@ public class FileInformationImpl implements FileInformation{
 		}
 		this.reserved0 = 0;
 
-		if ((this.fileAttributes &= FILE_ATTRIBUTE_DIRECTORY) != 0) {
+		if ((this.fileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 			this.reserved0 |= S_IFDIR;
 		}
 		if (fstatus.isSymlink()) {
@@ -65,11 +64,13 @@ public class FileInformationImpl implements FileInformation{
 	}
 
 	/**
-	 * @param javaTime - in milliseconds since January 1, 1970 UTC.
-	 * @return fileTime -  number of 100-nanosecond intervals since January 1, 1601.
+	 * @param javaTime
+	 *            - in milliseconds since January 1, 1970 UTC.
+	 * @return fileTime - number of 100-nanosecond intervals since January 1,
+	 *         1601.
 	 */
 	private static long javaTimeToFileTime(long javaTime) {
-		long retVal = (javaTime*10000)+ 116444736000000000L;
+		long retVal = (javaTime * 10000) + 116444736000000000L;
 		return retVal;
 	}
 
@@ -87,7 +88,7 @@ public class FileInformationImpl implements FileInformation{
 		return retVal;
 	}
 
-	public int getFileAttributes() {
+	public long getFileAttributes() {
 		return fileAttributes;
 	}
 
@@ -103,12 +104,29 @@ public class FileInformationImpl implements FileInformation{
 		return fileSize;
 	}
 
-	public int getReserved0() {
+	public long getReserved0() {
 		return reserved0;
 	}
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("FileName: ").append(this.getFileName());
+		sb.append("\n\t Size:").append(getFileSize());
+		sb.append("\n\t Attributes:").append(getFileAttributes());
+		sb.append("\n\t Creation Time:").append(getFileCreationTime());
+		sb.append("\n\t Last Access Time:").append(getFileLastAccessTime());
+		sb.append("\n\t Reserved flags:").append(getReserved0());
+		return sb.toString();
+
 	}
 
 }

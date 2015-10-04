@@ -111,7 +111,7 @@ void HDFSAccessor::initFileEnumerator(JNIEnv* env)
     jclass wfxFileInformationClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/FileInformation"));
     if (!JVMState::instance()->exceptionExists(env))
     {
-        s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()I");
+        s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()J");
         assert(s_FileInfoGetFileAttributes != NULL);
         s_FileInfoGetFileCreationTime = env->GetMethodID(wfxFileInformationClass, "getFileCreationTime", "()J");
         assert(s_FileInfoGetFileCreationTime != NULL);
@@ -119,7 +119,7 @@ void HDFSAccessor::initFileEnumerator(JNIEnv* env)
         assert(s_FileInfoGetFileLastAccessTime != NULL);
         s_FileInfoGetFileSize = env->GetMethodID(wfxFileInformationClass, "getFileSize", "()J");
         assert(s_FileInfoGetFileSize != NULL);
-        s_FileInfoGetReserved0 = env->GetMethodID(wfxFileInformationClass, "getReserved0", "()I");
+        s_FileInfoGetReserved0 = env->GetMethodID(wfxFileInformationClass, "getReserved0", "()J");
         assert(s_FileInfoGetReserved0 != NULL);
     } else
     {
