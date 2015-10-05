@@ -90,8 +90,11 @@ public class FileSystemProxy implements WfxPair {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.cgc.wfx.WfxPair#getFileInformation(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.cgc.wfx.WfxPair#getFileInformation(java.lang.String,
+	 * java.lang.String)
 	 */
 	public FileInformation getFileInformation(String parentFolder,
 			String fileName) {
@@ -109,12 +112,47 @@ public class FileSystemProxy implements WfxPair {
 		try {
 
 			FileStatus fstatus = this.fileSystem.getFileStatus(path);
-			FileInformationImpl fileInformationImpl = new FileInformationImpl(fstatus);
+			FileInformationImpl fileInformationImpl = new FileInformationImpl(
+					fstatus);
 			log.debug("File details" + fileInformationImpl);
 			return fileInformationImpl;
 		} catch (IOException ioEx) {
 			log.error("FAIL on getting file info for " + parentFolder + "/"
 					+ fileName, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.cgc.wfx.WfxPair#mkDir(java.lang.String)
+	 */
+	@Override
+	public boolean mkDir(String folderPath) {
+		log.debug("Try to create folder " + folderPath);
+		Path fPath = new Path(folderPath);
+		try {
+			return this.fileSystem.mkdirs(fPath);
+		} catch (IOException ioEx) {
+			log.error("FAIL on creating folder " + fPath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.cgc.wfx.WfxPair#rmDir(java.lang.String)
+	 */
+	@Override
+	public boolean deletePath(String path) {
+		log.debug("Try to delete path " + path);
+		Path fPath = new Path(path);
+		try {
+			return this.fileSystem.delete(fPath, true);
+		} catch (IOException ioEx) {
+			log.error("FAIL on creating folder " + fPath, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}

@@ -111,13 +111,13 @@ int FsFindClose(HANDLE Hdl)
 BOOL FsMkDir(char* Path)
 {
     LOGGING("FsMkDir %s", Path);
-    return 0;
+    return HDFSAccessor::instance()->mkdir(Path);
 }
 
 BOOL FsRemoveDir(char* RemoteName)
 {
     LOGGING("FsRemoveDir %s", RemoteName);
-    return 0;
+    return HDFSAccessor::instance()->deletePath(RemoteName);
 }
 
 int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri)
@@ -147,6 +147,7 @@ int FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
 BOOL FsDeleteFile(char* RemoteName)
 {
     LOGGING("FsDeleteFile %s", RemoteName);
+    return HDFSAccessor::instance()->deletePath(RemoteName);
     return 0;
 }
 

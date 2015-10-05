@@ -157,6 +157,9 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
 
         delete[] options;
 
+    } else
+    {
+        retVal = JVMLoaded;
     }
     return retVal;
 

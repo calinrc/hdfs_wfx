@@ -12,18 +12,34 @@
 
 package org.cgc.wfx;
 
-
 public interface WfxPair {
 
-	void initFS() ;
+	void initFS();
 
 	/**
 	 * @param folderPath
 	 * @return String[]
 	 */
-	String[] getFolderContent(String folderPath) ;
+	String[] getFolderContent(String folderPath);
 
-	FileInformation getFileInformation(String parentFolder,
-			String fileName) ;
+	/**
+	 * @param parentFolder
+	 * @param fileName
+	 * @return FileInformation
+	 */
+	FileInformation getFileInformation(String parentFolder, String fileName);
+
+	/**
+	 * @param filePath
+	 * @return boolean
+	 */
+	boolean mkDir(String filePath);
+	
+	
+	/**
+	 * @param filePath
+	 * @return boolean
+	 */
+	boolean deletePath(String path);
 
 }

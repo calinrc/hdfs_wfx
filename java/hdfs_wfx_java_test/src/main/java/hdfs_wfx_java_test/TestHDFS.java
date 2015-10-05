@@ -35,6 +35,21 @@ public class TestHDFS {
 				FileInformation fi = pair.getFileInformation("/", item);
 				System.out.println("File " + fi);
 			}
+
+			long currentTimeMillis = System.currentTimeMillis();
+			String newFolderPath = "/user/newFolder_" + currentTimeMillis;
+			System.out.println("Try to create folder 1 " + newFolderPath);
+			pair.mkDir(newFolderPath);
+
+			pair.deletePath(newFolderPath);
+
+			String newFolderWithoutParent = "/user/newFolderUnexist_"
+					+ (currentTimeMillis + 1) + "/folder2_"
+					+ (currentTimeMillis + 2);
+			System.out.println("Try to create folder2 " + newFolderWithoutParent);
+			pair.mkDir(newFolderWithoutParent);
+
+			pair.deletePath("/user/newFolderUnexist_" + (currentTimeMillis + 1));
 			System.out.println("End");
 
 		} catch (Throwable thr) {

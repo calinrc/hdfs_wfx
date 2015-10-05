@@ -30,12 +30,17 @@ public:
 
     FileEnumerator* getFolderContent(char* path);
 
+    bool mkdir(char* path);
+
+    bool deletePath(char* path);
+
 private:
     HDFSAccessor();
     virtual ~HDFSAccessor();
     void initFileEnumerator(JNIEnv* env);
 
     jobject m_wfxPairObj;
+    bool m_initialized;
 
     static HDFSAccessor* s_instance;
 
@@ -43,6 +48,8 @@ public:
     static jmethodID s_WfxPairMetIdInitFS;
     static jmethodID s_WfxPairMetIdGetFolderContent;
     static jmethodID s_WfxPairMetIdGetFileInfo;
+    static jmethodID s_WfxPairMetIdMkDir;
+    static jmethodID s_WfxPairMetIdDelPath;
 
     static jmethodID s_FileInfoGetFileAttributes;
     static jmethodID s_FileInfoGetFileCreationTime;
