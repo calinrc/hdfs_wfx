@@ -162,20 +162,46 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
 
 }
 
-JNIEnv* JVMState::getEnv()
+JNIEnv* JVMState::getEnv(bool* isNewEnv)
 {
 
     JNIEnv* env = NULL;
+    if (isNewEnv != NULL)
+    {
+        *isNewEnv = false;
+    }
+
     if (m_jvm != NULL)
     {
-        if (JNI_OK != m_jvm->GetEnv((void **) &env, JNI_VERSION_1_2))
+        jint getEnvResult = m_jvm->GetEnv((void **) &env, JNI_VERSION_1_6);
+        switch (getEnvResult)
         {
-            m_jvm->AttachCurrentThread((void **) &env, NULL);
-            LOGGING("Create a new JNIEnv for a new thread. Make sure we are detaching it when not used anymore");
+            case JNI_OK:
+                //do nothing but return env obj
+                break;
+            case JNI_EDETACHED:
+                m_jvm->AttachCurrentThread((void **) &env, NULL);
+                LOGGING("Create a new JNIEnv for a new thread. Make sure we are detaching it when not used anymore")
+                if (isNewEnv != NULL)
+                {
+                    *isNewEnv = true;
+                }
+                break;
+            case JNI_EVERSION:
+                LOGGING("JNI version 1.6 not supported by current JVM")
+                break;
+            default:
+                LOGGING("Fail on getting JNIEnv element for current thread. Fail with error %d", getEnvResult)
         }
-
     }
+
     return env;
+}
+
+void JVMState::releaseEnv()
+{
+    LOGGING("Detach current thread")
+    m_jvm->DetachCurrentThread();
 }
 
 JVMStateEnum JVMState::detach()

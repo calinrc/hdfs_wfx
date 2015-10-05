@@ -18,10 +18,9 @@
 #include <sys/stat.h>
 #include "Logger.h"
 
-FileEnumerator::FileEnumerator(JNIEnv* env, jobject wfxPairObj, string& parentPath, set<string>& content) :
-        m_parent(parentPath), m_content(content), m_wfxPairObj(NULL)
+FileEnumerator::FileEnumerator(jobject wfxPairObj, string& parentPath, set<string>& content) :
+        m_parent(parentPath), m_content(content), m_wfxPairObj(wfxPairObj)
 {
-    m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
     m_it = m_content.begin();
 }
 
@@ -33,15 +32,20 @@ FileEnumerator::~FileEnumerator()
 bool FileEnumerator::getNext(WIN32_FIND_DATAA *FindData)
 {
     bool hasContent = m_it != m_content.end();
+    bool isNewEnv = false;
     if (hasContent)
     {
         string item = *m_it;
-        JNIEnv* env = JVMState::instance()->getEnv();
+        JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
         jobject fileInfoObj = getFileInfo(env, m_parent, item);
         if (fileInfoObj != NULL)
         {
             getFileInfoContent(env, fileInfoObj, item, FindData);
             env->DeleteLocalRef(fileInfoObj);
+        }
+        if (isNewEnv)
+        {
+            JVMState::instance()->releaseEnv();
         }
         ++m_it;
     }
@@ -51,8 +55,13 @@ void FileEnumerator::close()
 {
     if (m_wfxPairObj != NULL)
     {
-        JNIEnv* env = JVMState::instance()->getEnv();
+        bool isNewEnv = false;
+        JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
         env->DeleteGlobalRef(m_wfxPairObj);
+        if (isNewEnv)
+        {
+            JVMState::instance()->releaseEnv();
+        }
         m_wfxPairObj = NULL;
     }
 }

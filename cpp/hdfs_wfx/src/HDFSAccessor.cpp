@@ -47,8 +47,8 @@ int HDFSAccessor::initialize()
     char dependenciesPath[MAX_PATH];
     size_t pathSize = MAX_PATH;
     memset(dependenciesPath, 0, sizeof(dependenciesPath));
-
-    JNIEnv* env = JVMState::instance()->getEnv();
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
     Utilities::getJavaDependenciesPath(dependenciesPath, &pathSize);
 
     jclass wfxLauncherClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/FSClientLauncher"));
@@ -78,7 +78,6 @@ int HDFSAccessor::initialize()
 
         initFileEnumerator(env);
 
-
         if (!JVMState::instance()->exceptionExists(env))
         {
             m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
@@ -96,12 +95,19 @@ int HDFSAccessor::initialize()
         env->DeleteLocalRef(wfxPairObj);
         env->DeleteLocalRef(wfxPairClass);
         env->DeleteLocalRef(wfxLauncherClass);
-
+        if (isNewEnv)
+        {
+            JVMState::instance()->releaseEnv();
+        }
         return 0;
     } else
     {
         LOGGING("Unable to find Java launcher jar %s and its WfxPair class", JAVA_LAUNCHER_VAL)
         assert(false);
+    }
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
     }
     return -1;
 }
@@ -129,18 +135,23 @@ void HDFSAccessor::initFileEnumerator(JNIEnv* env)
 
 void HDFSAccessor::release()
 {
-    JNIEnv* env = JVMState::instance()->getEnv();
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
     if (m_wfxPairObj != NULL)
     {
         env->DeleteGlobalRef(m_wfxPairObj);
         m_wfxPairObj = NULL;
     }
-
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
+    }
 }
 
 FileEnumerator* HDFSAccessor::getFolderContent(char* path)
 {
-    JNIEnv* env = JVMState::instance()->getEnv();
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
     if (m_wfxPairObj != NULL)
     {
         jstring pathStr = env->NewStringUTF(path);
@@ -164,9 +175,23 @@ FileEnumerator* HDFSAccessor::getFolderContent(char* path)
                     }
                 }
                 string pathStr(path);
-                return new FileEnumerator(env, m_wfxPairObj, pathStr, contentItems);
+                if (isNewEnv)
+                {
+                    JVMState::instance()->releaseEnv();
+                }
+                jobject neObj = env->NewGlobalRef(m_wfxPairObj);
+                if (isNewEnv)
+                {
+                    JVMState::instance()->releaseEnv();
+                }
+                return new FileEnumerator(neObj, pathStr, contentItems);
             }
         }
     }
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
+    }
+
     return NULL;
 }

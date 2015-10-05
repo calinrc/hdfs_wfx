@@ -34,7 +34,7 @@ using namespace std;
 class FileEnumerator
 {
 public:
-    FileEnumerator(JNIEnv* env, jobject wfxPairObj, string& parentPath, set<string>& content);
+    FileEnumerator(jobject wfxPairObj, string& parentPath, set<string>& content);
     bool getNext(WIN32_FIND_DATAA *FindData);
     void close();
     virtual ~FileEnumerator();

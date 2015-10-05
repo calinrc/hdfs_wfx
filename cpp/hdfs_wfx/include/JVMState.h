@@ -24,7 +24,9 @@ public:
 
     JVMStateEnum initialize(const char* javaLauncherJar);
 
-    JNIEnv* getEnv();
+    JNIEnv* getEnv(bool* isNewEnv = NULL);
+
+    void releaseEnv();
 
     bool exceptionExists(JNIEnv* env);
 
