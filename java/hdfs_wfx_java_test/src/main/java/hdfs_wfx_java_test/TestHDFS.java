@@ -23,9 +23,9 @@ public class TestHDFS {
 
 	public static void main(String[] args) {
 		try {
-			String path = System.getProperty("user.home");
+			String homePath = System.getProperty("user.home");
 
-			WfxPair pair = FSClientLauncher.getPairInstance(path
+			WfxPair pair = FSClientLauncher.getPairInstance(homePath
 					+ File.separatorChar + Constants.DEPENDENCIES_PATH);
 			System.out.println("Init");
 			pair.initFS();
@@ -52,7 +52,14 @@ public class TestHDFS {
 			pair.deletePath("/user/newFolderUnexist_" + (currentTimeMillis + 1));
 			
 			pair.mkDir("/user/folderToRename");
-			pair.renamePath("/user/folderToRename", "/user/folderToRenameChanged");
+			pair.renamePath("/user/folderToRename", "/user/folderToRenameChanged_"+System.currentTimeMillis());
+			
+			pair.mkDir("/user/upload");
+			pair.putFile(homePath+File.separatorChar+".bashrc", "/user/upload", true);
+			
+			pair.getFile("/user/upload/.bashrc" , new File(".").getAbsolutePath()+File.separatorChar+".cucu");
+			
+			
 			System.out.println("End");
 
 		} catch (Throwable thr) {

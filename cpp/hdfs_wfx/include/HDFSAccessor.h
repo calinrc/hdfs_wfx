@@ -36,6 +36,11 @@ public:
 
     bool rename(char* oldPath, char* newPath);
 
+    bool getFile(char* remotePath, char* localPath);
+
+    bool putFile(char* localPath, char* remotePath, bool overwrite);
+
+
 private:
     HDFSAccessor();
     virtual ~HDFSAccessor();
@@ -53,6 +58,8 @@ public:
     static jmethodID s_WfxPairMetIdMkDir;
     static jmethodID s_WfxPairMetIdDelPath;
     static jmethodID s_WfxPairMetIdRenPath;
+    static jmethodID s_WfxPairMetIdGetPath;
+    static jmethodID s_WfxPairMetIdPutPath;
 
     static jmethodID s_FileInfoGetFileAttributes;
     static jmethodID s_FileInfoGetFileCreationTime;

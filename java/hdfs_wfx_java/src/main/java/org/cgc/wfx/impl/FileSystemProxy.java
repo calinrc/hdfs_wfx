@@ -44,11 +44,9 @@ public class FileSystemProxy implements WfxPair {
 		try {
 			Configuration config = new Configuration();
 
-			for (String file : new String[] { "core-site.xml",
-					"mapred-site.xml", "hdfs-site.xml", "yarn-site.xml" }) {
-				URL url = new File(System.getProperty("user.home")
-						+ File.separatorChar + Constants.DEPENDENCIES_PATH
-						+ File.separatorChar + file).toURI().toURL();
+			for (String file : new String[] { "core-site.xml", "mapred-site.xml", "hdfs-site.xml", "yarn-site.xml" }) {
+				URL url = new File(System.getProperty("user.home") + File.separatorChar + Constants.DEPENDENCIES_PATH + File.separatorChar
+						+ file).toURI().toURL();
 				if (url != null) {
 					config.addResource(url);
 				}
@@ -96,8 +94,7 @@ public class FileSystemProxy implements WfxPair {
 	 * @see org.cgc.wfx.WfxPair#getFileInformation(java.lang.String,
 	 * java.lang.String)
 	 */
-	public FileInformation getFileInformation(String parentFolder,
-			String fileName) {
+	public FileInformation getFileInformation(String parentFolder, String fileName) {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(parentFolder);
@@ -112,13 +109,11 @@ public class FileSystemProxy implements WfxPair {
 		try {
 
 			FileStatus fstatus = this.fileSystem.getFileStatus(path);
-			FileInformationImpl fileInformationImpl = new FileInformationImpl(
-					fstatus);
+			FileInformationImpl fileInformationImpl = new FileInformationImpl(fstatus);
 			log.debug("File details" + fileInformationImpl);
 			return fileInformationImpl;
 		} catch (IOException ioEx) {
-			log.error("FAIL on getting file info for " + parentFolder + "/"
-					+ fileName, ioEx);
+			log.error("FAIL on getting file info for " + parentFolder + "/" + fileName, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}
@@ -159,13 +154,39 @@ public class FileSystemProxy implements WfxPair {
 
 	@Override
 	public boolean renamePath(String oldPath, String newPath) {
-		log.debug("Try to rename path " + oldPath + " to new path "+newPath);
+		log.debug("Try to rename path " + oldPath + " to new path " + newPath);
 		Path foldPath = new Path(oldPath);
 		Path fnewPath = new Path(newPath);
 		try {
 			return this.fileSystem.rename(foldPath, fnewPath);
 		} catch (IOException ioEx) {
-			log.error("FAIL on renaming path " + foldPath + " to new path " +fnewPath, ioEx);
+			log.error("FAIL on renaming path " + foldPath + " to new path " + fnewPath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
+	@Override
+	public void getFile(String remotePath, String localPath) {
+		log.debug("Try to get path " + remotePath + " to local path " + localPath);
+		Path fRemotePath = new Path(remotePath);
+		Path fLocalPath = new Path(localPath);
+		try {
+			this.fileSystem.copyToLocalFile(false, fRemotePath, fLocalPath, true);
+		} catch (IOException ioEx) {
+			log.error("FAIL on getting path " + fRemotePath + " to local path " + fLocalPath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
+	@Override
+	public void putFile(String localPath, String remotePath, boolean overwrite) {
+		log.debug("Try to get path " + remotePath + " to local path " + localPath);
+		Path fLocalPath = new Path(localPath);
+		Path fRemotePath = new Path(remotePath);
+		try {
+			this.fileSystem.copyFromLocalFile(false, overwrite, fLocalPath, fRemotePath);
+		} catch (IOException ioEx) {
+			log.error("FAIL on putting path " + fRemotePath + " to local path " + fLocalPath, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}

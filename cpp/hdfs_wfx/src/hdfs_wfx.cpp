@@ -124,19 +124,23 @@ int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, Remote
 {
     LOGGING("FsRenMovFile oldName %s -> newName %s - Move: %d - Overwrite: %d", OldName, NewName, Move, OverWrite);
     bool success = HDFSAccessor::instance()->rename(OldName, NewName);
-    return success ? FS_FILE_OK:  FS_FILE_NOTFOUND;
+    return success ? FS_FILE_OK : FS_FILE_NOTFOUND;
 }
 
 int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)
 {
-    LOGGING("FsGetFile");
-    return -1;
+    LOGGING("FsGetFile from %s to %s wiht copy flags %d", RemoteName, LocalName, CopyFlags);
+    bool success = HDFSAccessor::instance()->getFile(RemoteName, LocalName);
+    return success ? FS_FILE_OK : FS_FILE_READERROR;
+
+    //FS_FILE_READERROR, FS_FILE_USERABORT, FS_FILE_NOTFOUND, FS_FILE_NOTSUPPORTED
 }
 
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
     LOGGING("FsPutFile Local path %s in HDFS path %s with flags %d", LocalName, RemoteName, CopyFlags);
-    return -1;
+    bool success = HDFSAccessor::instance()->putFile(LocalName, RemoteName, true);
+    return success ? FS_FILE_OK : FS_FILE_WRITEERROR;
 }
 
 int FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
@@ -167,8 +171,7 @@ BOOL FsDisconnect(char *DisconnectRoot)
 
 void FsSetDefaultParams(FsDefaultParamStruct* dps)
 {
-    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi,
-            dps->PluginInterfaceVersionLow, dps->size);
+    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi, dps->PluginInterfaceVersionLow, dps->size);
 }
 
 void FsGetDefRootName(char* DefRootName, int maxlen)

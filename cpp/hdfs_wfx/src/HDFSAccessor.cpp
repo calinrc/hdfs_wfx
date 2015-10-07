@@ -27,6 +27,8 @@ jmethodID HDFSAccessor::s_WfxPairMetIdGetFileInfo = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdMkDir = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdDelPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdRenPath = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdGetPath = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdPutPath = NULL;
 
 jmethodID HDFSAccessor::s_FileInfoGetFileAttributes = NULL;
 jmethodID HDFSAccessor::s_FileInfoGetFileCreationTime = NULL;
@@ -88,7 +90,13 @@ int HDFSAccessor::initialize()
             assert(s_WfxPairMetIdDelPath != NULL);
 
             s_WfxPairMetIdRenPath = env->GetMethodID(wfxPairClass, "renamePath", "(Ljava/lang/String;Ljava/lang/String;)Z");
-            assert(s_WfxPairMetIdDelPath != NULL);
+            assert(s_WfxPairMetIdRenPath != NULL);
+
+            s_WfxPairMetIdGetPath = env->GetMethodID(wfxPairClass, "getFile", "(Ljava/lang/String;Ljava/lang/String;)V");
+            assert(s_WfxPairMetIdGetPath != NULL);
+
+            s_WfxPairMetIdPutPath = env->GetMethodID(wfxPairClass, "putFile", "(Ljava/lang/String;Ljava/lang/String;Z)V");
+            assert(s_WfxPairMetIdPutPath != NULL);
 
             initFileEnumerator(env);
 
@@ -307,3 +315,68 @@ bool HDFSAccessor::rename(char* oldPath, char* newPath)
     return false;
 }
 
+bool HDFSAccessor::getFile(char* remotePath, char* localPath)
+{
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
+    if (m_wfxPairObj != NULL)
+    {
+        jstring remotePathStr = env->NewStringUTF(remotePath);
+        jstring localPathStr = env->NewStringUTF(localPath);
+
+        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdGetPath, remotePathStr, localPathStr);
+        if (!JVMState::instance()->exceptionExists(env))
+        {
+            env->DeleteLocalRef(localPathStr);
+            env->DeleteLocalRef(remotePathStr);
+            if (isNewEnv)
+            {
+                JVMState::instance()->releaseEnv();
+            }
+            return true;
+        } else
+        {
+            env->DeleteLocalRef(localPathStr);
+            env->DeleteLocalRef(remotePathStr);
+        }
+
+    }
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
+    }
+    return false;
+}
+
+bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite)
+{
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
+    if (m_wfxPairObj != NULL)
+    {
+        jstring localPathStr = env->NewStringUTF(localPath);
+        jstring remotePathStr = env->NewStringUTF(remotePath);
+        jboolean joverwrite = overwrite;
+        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdPutPath, localPathStr, remotePathStr, joverwrite);
+        if (!JVMState::instance()->exceptionExists(env))
+        {
+            env->DeleteLocalRef(localPathStr);
+            env->DeleteLocalRef(remotePathStr);
+            if (isNewEnv)
+            {
+                JVMState::instance()->releaseEnv();
+            }
+            return true;
+        } else
+        {
+            env->DeleteLocalRef(localPathStr);
+            env->DeleteLocalRef(remotePathStr);
+        }
+
+    }
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
+    }
+    return false;
+}

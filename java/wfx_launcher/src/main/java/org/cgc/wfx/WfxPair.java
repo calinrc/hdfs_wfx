@@ -34,20 +34,32 @@ public interface WfxPair {
 	 * @return boolean
 	 */
 	boolean mkDir(String filePath);
-	
-	
+
 	/**
 	 * @param filePath
 	 * @return boolean
 	 */
 	boolean deletePath(String path);
-	
-	
+
 	/**
 	 * @param oldPath
 	 * @param newPath
 	 * @return boolean
 	 */
 	boolean renamePath(String oldPath, String newPath);
+
+	/**
+	 * @param remotePath
+	 * @param localPath
+	 * @return boolean
+	 */
+	void getFile(String remotePath, String localPath);
+
+	/**
+	 * @param localPath
+	 * @param remotePath
+	 * @return boolean
+	 */
+	void putFile(String localPath, String remotePath, boolean overwrite);
 
 }
