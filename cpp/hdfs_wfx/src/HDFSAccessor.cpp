@@ -26,6 +26,7 @@ jmethodID HDFSAccessor::s_WfxPairMetIdGetFolderContent = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdGetFileInfo = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdMkDir = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdDelPath = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdRenPath = NULL;
 
 jmethodID HDFSAccessor::s_FileInfoGetFileAttributes = NULL;
 jmethodID HDFSAccessor::s_FileInfoGetFileCreationTime = NULL;
@@ -84,6 +85,9 @@ int HDFSAccessor::initialize()
             assert(s_WfxPairMetIdMkDir != NULL);
 
             s_WfxPairMetIdDelPath = env->GetMethodID(wfxPairClass, "deletePath", "(Ljava/lang/String;)Z");
+            assert(s_WfxPairMetIdDelPath != NULL);
+
+            s_WfxPairMetIdRenPath = env->GetMethodID(wfxPairClass, "renamePath", "(Ljava/lang/String;Ljava/lang/String;)Z");
             assert(s_WfxPairMetIdDelPath != NULL);
 
             initFileEnumerator(env);
@@ -263,6 +267,38 @@ bool HDFSAccessor::deletePath(char* path)
         {
             env->DeleteLocalRef(pathStr);
         }
+    }
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
+    }
+    return false;
+}
+
+bool HDFSAccessor::rename(char* oldPath, char* newPath)
+{
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
+    if (m_wfxPairObj != NULL)
+    {
+        jstring oldPathStr = env->NewStringUTF(oldPath);
+        jstring newPathStr = env->NewStringUTF(newPath);
+        jboolean retVal = env->CallBooleanMethod(m_wfxPairObj, s_WfxPairMetIdRenPath, oldPathStr, newPathStr);
+        if (!JVMState::instance()->exceptionExists(env))
+        {
+            env->DeleteLocalRef(oldPathStr);
+            env->DeleteLocalRef(newPathStr);
+            if (isNewEnv)
+            {
+                JVMState::instance()->releaseEnv();
+            }
+            return retVal;
+        } else
+        {
+            env->DeleteLocalRef(oldPathStr);
+            env->DeleteLocalRef(newPathStr);
+        }
+
     }
     if (isNewEnv)
     {

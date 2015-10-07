@@ -157,4 +157,17 @@ public class FileSystemProxy implements WfxPair {
 		}
 	}
 
+	@Override
+	public boolean renamePath(String oldPath, String newPath) {
+		log.debug("Try to rename path " + oldPath + " to new path "+newPath);
+		Path foldPath = new Path(oldPath);
+		Path fnewPath = new Path(newPath);
+		try {
+			return this.fileSystem.rename(foldPath, fnewPath);
+		} catch (IOException ioEx) {
+			log.error("FAIL on renaming path " + foldPath + " to new path " +fnewPath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
 }

@@ -34,6 +34,8 @@ public:
 
     bool deletePath(char* path);
 
+    bool rename(char* oldPath, char* newPath);
+
 private:
     HDFSAccessor();
     virtual ~HDFSAccessor();
@@ -50,6 +52,7 @@ public:
     static jmethodID s_WfxPairMetIdGetFileInfo;
     static jmethodID s_WfxPairMetIdMkDir;
     static jmethodID s_WfxPairMetIdDelPath;
+    static jmethodID s_WfxPairMetIdRenPath;
 
     static jmethodID s_FileInfoGetFileAttributes;
     static jmethodID s_FileInfoGetFileCreationTime;

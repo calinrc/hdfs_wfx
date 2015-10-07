@@ -41,5 +41,13 @@ public interface WfxPair {
 	 * @return boolean
 	 */
 	boolean deletePath(String path);
+	
+	
+	/**
+	 * @param oldPath
+	 * @param newPath
+	 * @return boolean
+	 */
+	boolean renamePath(String oldPath, String newPath);
 
 }

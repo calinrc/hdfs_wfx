@@ -123,7 +123,8 @@ BOOL FsRemoveDir(char* RemoteName)
 int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri)
 {
     LOGGING("FsRenMovFile oldName %s -> newName %s - Move: %d - Overwrite: %d", OldName, NewName, Move, OverWrite);
-    return -1;
+    bool success = HDFSAccessor::instance()->rename(OldName, NewName);
+    return success ? FS_FILE_OK:  FS_FILE_NOTFOUND;
 }
 
 int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)

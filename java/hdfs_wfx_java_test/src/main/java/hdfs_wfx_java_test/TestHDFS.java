@@ -50,6 +50,9 @@ public class TestHDFS {
 			pair.mkDir(newFolderWithoutParent);
 
 			pair.deletePath("/user/newFolderUnexist_" + (currentTimeMillis + 1));
+			
+			pair.mkDir("/user/folderToRename");
+			pair.renamePath("/user/folderToRename", "/user/folderToRenameChanged");
 			System.out.println("End");
 
 		} catch (Throwable thr) {
