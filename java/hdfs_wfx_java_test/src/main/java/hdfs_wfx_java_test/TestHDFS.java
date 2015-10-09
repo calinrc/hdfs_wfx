@@ -46,20 +46,34 @@ public class TestHDFS {
 			String newFolderWithoutParent = "/user/newFolderUnexist_"
 					+ (currentTimeMillis + 1) + "/folder2_"
 					+ (currentTimeMillis + 2);
-			System.out.println("Try to create folder2 " + newFolderWithoutParent);
+			System.out.println("Try to create folder2 "
+					+ newFolderWithoutParent);
 			pair.mkDir(newFolderWithoutParent);
 
 			pair.deletePath("/user/newFolderUnexist_" + (currentTimeMillis + 1));
-			
+
 			pair.mkDir("/user/folderToRename");
-			pair.renamePath("/user/folderToRename", "/user/folderToRenameChanged_"+System.currentTimeMillis());
-			
+			pair.renamePath("/user/folderToRename",
+					"/user/folderToRenameChanged_" + System.currentTimeMillis());
+
 			pair.mkDir("/user/upload");
-			pair.putFile(homePath+File.separatorChar+".bashrc", "/user/upload", true);
-			
-			pair.getFile("/user/upload/.bashrc" , new File(".").getAbsolutePath()+File.separatorChar+".cucu");
-			
-			
+			pair.putFile(homePath + File.separatorChar + ".bashrc",
+					"/user/upload", true);
+
+			pair.getFile("/user/upload/.bashrc",
+					new File(".").getAbsolutePath() + File.separatorChar
+							+ ".cucu");
+
+			Runtime runtime = Runtime.getRuntime();
+
+			final int MB = 1024 * 1024;
+
+			System.out.println("Free Memory: " + (runtime.freeMemory() / MB));
+			System.out.println("Max Memory: " + (runtime.maxMemory() / MB));
+			System.out.println("Total Memory: " + (runtime.totalMemory() / MB));
+			System.out.println("Used Memory: "
+					+ ((runtime.totalMemory() - runtime.freeMemory()) / MB));
+
 			System.out.println("End");
 
 		} catch (Throwable thr) {

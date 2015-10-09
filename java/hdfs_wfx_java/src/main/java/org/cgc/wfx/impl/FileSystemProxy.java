@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.cgc.wfx.Constants;
@@ -44,9 +45,11 @@ public class FileSystemProxy implements WfxPair {
 		try {
 			Configuration config = new Configuration();
 
-			for (String file : new String[] { "core-site.xml", "mapred-site.xml", "hdfs-site.xml", "yarn-site.xml" }) {
-				URL url = new File(System.getProperty("user.home") + File.separatorChar + Constants.DEPENDENCIES_PATH + File.separatorChar
-						+ file).toURI().toURL();
+			for (String file : new String[] { "core-site.xml",
+					"mapred-site.xml", "hdfs-site.xml", "yarn-site.xml" }) {
+				URL url = new File(System.getProperty("user.home")
+						+ File.separatorChar + Constants.DEPENDENCIES_PATH
+						+ File.separatorChar + file).toURI().toURL();
 				if (url != null) {
 					config.addResource(url);
 				}
@@ -94,7 +97,8 @@ public class FileSystemProxy implements WfxPair {
 	 * @see org.cgc.wfx.WfxPair#getFileInformation(java.lang.String,
 	 * java.lang.String)
 	 */
-	public FileInformation getFileInformation(String parentFolder, String fileName) {
+	public FileInformation getFileInformation(String parentFolder,
+			String fileName) {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(parentFolder);
@@ -109,11 +113,13 @@ public class FileSystemProxy implements WfxPair {
 		try {
 
 			FileStatus fstatus = this.fileSystem.getFileStatus(path);
-			FileInformationImpl fileInformationImpl = new FileInformationImpl(fstatus);
+			FileInformationImpl fileInformationImpl = new FileInformationImpl(
+					fstatus);
 			log.debug("File details" + fileInformationImpl);
 			return fileInformationImpl;
 		} catch (IOException ioEx) {
-			log.error("FAIL on getting file info for " + parentFolder + "/" + fileName, ioEx);
+			log.error("FAIL on getting file info for " + parentFolder + "/"
+					+ fileName, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}
@@ -160,33 +166,55 @@ public class FileSystemProxy implements WfxPair {
 		try {
 			return this.fileSystem.rename(foldPath, fnewPath);
 		} catch (IOException ioEx) {
-			log.error("FAIL on renaming path " + foldPath + " to new path " + fnewPath, ioEx);
+			log.error("FAIL on renaming path " + foldPath + " to new path "
+					+ fnewPath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
+	@Override
+	public boolean copyPath(String srcPath, String destPath) {
+		log.debug("Try to rename path " + srcPath + " to new path " + destPath);
+		Path fsrcPath = new Path(srcPath);
+		Path fdestPath = new Path(destPath);
+		try {
+			return FileUtil.copy(this.fileSystem, fsrcPath, this.fileSystem,
+					fdestPath, false, fileSystem.getConf());
+		} catch (IOException ioEx) {
+			log.error("FAIL on renaming path " + fsrcPath + " to new path "
+					+ fdestPath, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}
 
 	@Override
 	public void getFile(String remotePath, String localPath) {
-		log.debug("Try to get path " + remotePath + " to local path " + localPath);
+		log.debug("Try to get path " + remotePath + " to local path "
+				+ localPath);
 		Path fRemotePath = new Path(remotePath);
 		Path fLocalPath = new Path(localPath);
 		try {
-			this.fileSystem.copyToLocalFile(false, fRemotePath, fLocalPath, true);
+			this.fileSystem.copyToLocalFile(false, fRemotePath, fLocalPath,
+					true);
 		} catch (IOException ioEx) {
-			log.error("FAIL on getting path " + fRemotePath + " to local path " + fLocalPath, ioEx);
+			log.error("FAIL on getting path " + fRemotePath + " to local path "
+					+ fLocalPath, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}
 
 	@Override
 	public void putFile(String localPath, String remotePath, boolean overwrite) {
-		log.debug("Try to get path " + remotePath + " to local path " + localPath);
+		log.debug("Try to get path " + remotePath + " to local path "
+				+ localPath);
 		Path fLocalPath = new Path(localPath);
 		Path fRemotePath = new Path(remotePath);
 		try {
-			this.fileSystem.copyFromLocalFile(false, overwrite, fLocalPath, fRemotePath);
+			this.fileSystem.copyFromLocalFile(false, overwrite, fLocalPath,
+					fRemotePath);
 		} catch (IOException ioEx) {
-			log.error("FAIL on putting path " + fRemotePath + " to local path " + fLocalPath, ioEx);
+			log.error("FAIL on putting path " + fRemotePath + " to local path "
+					+ fLocalPath, ioEx);
 			throw new WfxHdfsException(ioEx);
 		}
 	}

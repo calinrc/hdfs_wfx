@@ -47,6 +47,14 @@ public interface WfxPair {
 	 * @return boolean
 	 */
 	boolean renamePath(String oldPath, String newPath);
+	
+	
+	/**
+	 * @param srcPath
+	 * @param destPath
+	 * @return boolean
+	 */
+	boolean copyPath(String srcPath, String destPath);
 
 	/**
 	 * @param remotePath

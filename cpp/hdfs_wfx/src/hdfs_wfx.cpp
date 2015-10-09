@@ -123,7 +123,14 @@ BOOL FsRemoveDir(char* RemoteName)
 int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, RemoteInfoStruct* ri)
 {
     LOGGING("FsRenMovFile oldName %s -> newName %s - Move: %d - Overwrite: %d", OldName, NewName, Move, OverWrite);
-    bool success = HDFSAccessor::instance()->rename(OldName, NewName);
+    bool success = false;
+    if (Move)
+    {
+        success = HDFSAccessor::instance()->rename(OldName, NewName);
+    } else
+    {
+        success = HDFSAccessor::instance()->copy(OldName, NewName);
+    }
     return success ? FS_FILE_OK : FS_FILE_NOTFOUND;
 }
 
@@ -171,7 +178,8 @@ BOOL FsDisconnect(char *DisconnectRoot)
 
 void FsSetDefaultParams(FsDefaultParamStruct* dps)
 {
-    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi, dps->PluginInterfaceVersionLow, dps->size);
+    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi,
+            dps->PluginInterfaceVersionLow, dps->size);
 }
 
 void FsGetDefRootName(char* DefRootName, int maxlen)

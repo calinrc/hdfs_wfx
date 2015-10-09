@@ -43,22 +43,28 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
 
         LOGGING("Start creating JVM");
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
-        JavaVMOption* options = new JavaVMOption[2];
+        JavaVMOption* options = new JavaVMOption[4];
 
         char classpathParam[MAX_PATH + 100];
         char log4j[MAX_PATH + 100];
         char log4jParam[MAX_PATH + 100];
+        char xms[10];
+        char xmx[10];
 
         size_t pathSize = MAX_PATH;
 
         memset(classpathParam, 0, sizeof(classpathParam));
         memset(log4j, 0, sizeof(log4j));
         memset(log4jParam, 0, sizeof(log4jParam));
+        memset(xms, 0, sizeof(xms));
+        memset(xmx, 0, sizeof(xmx));
 
         sprintf(classpathParam, "-Djava.class.path=%s", javaLauncherJar);
 
         Utilities::getJavaLoggerFileLocation(log4j, &pathSize);
         sprintf(log4jParam, "-Dlog4j.configuration=file://%s", log4j);
+        strcpy(xms, "-Xms32M");
+        strcpy(xmx, "-Xmx128M");
 
         LOGGING("Using classpath param:  \"%s\" ", classpathParam);
 
@@ -69,25 +75,19 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
 
         options[1].optionString = log4jParam; //(char*) "-Dlog4j.configuration=file:///home/ae/.config/doublecmd/plugins/hdfs_wfx/log4j.xml";
         options[1].extraInfo = 0;
+
+        options[2].optionString = xms;
+        options[2].extraInfo = 0;
+
+        options[3].optionString = xmx;
+        options[3].extraInfo = 0;
+
+
         vm_args.version = JNI_VERSION_1_6;
-        vm_args.nOptions = 2;
+        vm_args.nOptions = 4;
         vm_args.options = options;
         vm_args.ignoreUnrecognized = false;
-        /*
-         JNIEnv* env;
-         jint jvmCreateState = JNI_CreateJavaVM(&m_jvm, (void**) &env, &vm_args);
 
-         if (jvmCreateState == JNI_OK)
-         {
-         LOGGING("JVM create OK");
-         m_initialized = true;
-         retVal = JVMLoaded;
-         }else{
-         LOGGING("Fail to create JVM. Exit with code %d", jvmCreateState)
-         }
-
-         LOGGING("End JVM creation");
-         */
         /* load and initialize a Java VM, return a JNI interface
          * pointer in env */
 

@@ -27,6 +27,7 @@ jmethodID HDFSAccessor::s_WfxPairMetIdGetFileInfo = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdMkDir = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdDelPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdRenPath = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdCopyPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdGetPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdPutPath = NULL;
 
@@ -91,6 +92,9 @@ int HDFSAccessor::initialize()
 
             s_WfxPairMetIdRenPath = env->GetMethodID(wfxPairClass, "renamePath", "(Ljava/lang/String;Ljava/lang/String;)Z");
             assert(s_WfxPairMetIdRenPath != NULL);
+
+            s_WfxPairMetIdCopyPath = env->GetMethodID(wfxPairClass, "copyPath", "(Ljava/lang/String;Ljava/lang/String;)Z");
+            assert(s_WfxPairMetIdCopyPath != NULL);
 
             s_WfxPairMetIdGetPath = env->GetMethodID(wfxPairClass, "getFile", "(Ljava/lang/String;Ljava/lang/String;)V");
             assert(s_WfxPairMetIdGetPath != NULL);
@@ -314,6 +318,40 @@ bool HDFSAccessor::rename(char* oldPath, char* newPath)
     }
     return false;
 }
+
+
+bool HDFSAccessor::copy(char* srcPath, char* destPath)
+{
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
+    if (m_wfxPairObj != NULL)
+    {
+        jstring srcPathStr = env->NewStringUTF(srcPath);
+        jstring destPathStr = env->NewStringUTF(destPath);
+        jboolean retVal = env->CallBooleanMethod(m_wfxPairObj, s_WfxPairMetIdCopyPath, srcPathStr, destPathStr);
+        if (!JVMState::instance()->exceptionExists(env))
+        {
+            env->DeleteLocalRef(srcPathStr);
+            env->DeleteLocalRef(destPathStr);
+            if (isNewEnv)
+            {
+                JVMState::instance()->releaseEnv();
+            }
+            return retVal;
+        } else
+        {
+            env->DeleteLocalRef(srcPathStr);
+            env->DeleteLocalRef(destPathStr);
+        }
+
+    }
+    if (isNewEnv)
+    {
+        JVMState::instance()->releaseEnv();
+    }
+    return false;
+}
+
 
 bool HDFSAccessor::getFile(char* remotePath, char* localPath)
 {

@@ -13,6 +13,7 @@
 #ifndef INCLUDE_GENDEF_H_
 #define INCLUDE_GENDEF_H_
 
+#include <HdfsWfxVersion.h>
 #include <stddef.h>
 
 #define PLUGINS_LOCATION ".config/doublecmd/plugins"
