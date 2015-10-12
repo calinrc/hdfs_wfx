@@ -17,9 +17,13 @@
 		<copy file="./target/wfx_launcher/wfx_launcher.jar" todir="../../install/temp/plugins/hdfs_wfx/java" />
 		<copy file="./target/hdfs_wfx_java/hdfs_wfx.jar" todir="../../install/temp/plugins/hdfs_wfx/java/deps" />
 		<copy file="../../cpp/hdfs_wfx/mak/hdfs_wfx.wfx" todir="../../install/temp/plugins/hdfs_wfx/" />
+		
+		<copy file="../../install/install.xml" todir="../../install/temp" />
 		<copy todir="../../install/temp/plugins/hdfs_wfx/java/deps">
 			<fileset dir="../../install/hadoop-xmls" />
-			<fileset dir="../hdfs_wfx_java/lib" />
+			<fileset dir="../hdfs_wfx_java/lib">
+				<exclude name="wfx_launcher*.jar"/>
+			</fileset>
 		</copy>
 
 		<delete file="../../install/hdfs_wfx.zip" />
