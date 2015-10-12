@@ -31,7 +31,7 @@
 	<target name="clean" depends="init">
 		<delete dir="${basedir}/lib" />
 		<delete dir="${basedir}/../build/target/${ant.project.name}" />
-		<ivy:cleancache />
+		<!--<ivy:cleancache /> -->
 	</target>
 
 	<target name="retrieve" depends="init">

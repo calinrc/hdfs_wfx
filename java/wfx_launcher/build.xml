@@ -4,7 +4,7 @@
 
 	<target name="deploy">
 		<mkdir dir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java" />
-		<copy file="${basedir}/log4j.xml" todir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java" overwrite="true" />
+		<copy file="${basedir}/log4j-debug.xml" tofile="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java/log4j.xml" overwrite="true" />
 		<copy file="../build/target/${ant.project.name}/${artifact.name}" todir="${user.home}/.config/doublecmd/plugins/hdfs_wfx/java" overwrite="true" />
 	</target>
 </project>

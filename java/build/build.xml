@@ -1,0 +1,39 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="build">
+	<target name="build">
+		<echo message="Start main build" />
+		<ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="build" />
+		<ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="build" />
+		<exec command="make CONFIGURATION=RELEASE" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
+		<antcall target="pack" />
+		<echo message="End main build" />
+
+	</target>
+
+	<target name="pack">
+		<echo message="Start packing things ..." />
+		<mkdir dir="../../install/temp/plugins/hdfs_wfx/java/deps" />
+		<mkdir dir="../../install/temp/plugins/hdfs_wfx/logs" />
+		<copy file="../wfx_launcher/log4j-release.xml" tofile="../../install/temp/plugins/hdfs_wfx/java/log4j.xml" />
+		<copy file="./target/wfx_launcher/wfx_launcher.jar" todir="../../install/temp/plugins/hdfs_wfx/java" />
+		<copy file="./target/hdfs_wfx_java/hdfs_wfx.jar" todir="../../install/temp/plugins/hdfs_wfx/java/deps" />
+		<copy file="../../cpp/hdfs_wfx/mak/hdfs_wfx.wfx" todir="../../install/temp/plugins/hdfs_wfx/" />
+		<copy todir="../../install/temp/plugins/hdfs_wfx/java/deps">
+			<fileset dir="../../install/hadoop-xmls" />
+			<fileset dir="../hdfs_wfx_java/lib" />
+		</copy>
+
+		<delete file="../../install/hdfs_wfx.zip" />
+		<zip destfile="../../install/hdfs_wfx.zip" basedir="../../install/temp" />
+		<delete dir="../../install/temp" />
+
+	</target>
+
+	<target name="clean">
+		<echo message="Start clean main build" />
+		<delete dir="../../install/temp" />
+		<ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="clean" />
+		<ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="clean" />
+		<exec command="make clean CONFIGURATION=RELEASE" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
+		<echo message="End clean main build" />
+	</target>
+</project>
