@@ -207,10 +207,6 @@ FileEnumerator* HDFSAccessor::getFolderContent(char* path)
                     }
                 }
                 string pathStr(path);
-                if (isNewEnv)
-                {
-                    JVMState::instance()->releaseEnv();
-                }
                 jobject neObj = env->NewGlobalRef(m_wfxPairObj);
                 if (isNewEnv)
                 {

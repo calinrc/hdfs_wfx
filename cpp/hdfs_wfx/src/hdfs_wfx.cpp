@@ -46,7 +46,11 @@ int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tReques
 {
     gProgressProc = pProgressProc;
     gRequestProc = pRequestProc;
+#ifdef HDFS_WFX_DEBUG
     Logger::getInstance()->init(true, true, pLogProc, PluginNr);
+#else
+    Logger::getInstance()->init(true, false, pLogProc, PluginNr);
+#endif
     LOGGING("FSInit");
 
     char javaLauncherPath[MAX_PATH];
@@ -82,7 +86,6 @@ HANDLE FsFindFirst(char* Path, WIN32_FIND_DATAA *FindData)
         }
 
     }
-
     return handle;
 }
 
@@ -178,13 +181,16 @@ BOOL FsDisconnect(char *DisconnectRoot)
 
 void FsSetDefaultParams(FsDefaultParamStruct* dps)
 {
-    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi,
-            dps->PluginInterfaceVersionLow, dps->size);
+    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi, dps->PluginInterfaceVersionLow, dps->size);
 }
 
 void FsGetDefRootName(char* DefRootName, int maxlen)
 {
+#ifdef HDFS_WFX_DEBUG
     Logger::getInstance()->init(true, true);
+#else
+    Logger::getInstance()->init(true, false);
+#endif
     LOGGING("FsGetDefRootName");
     strncpy(DefRootName, "HDFS", maxlen);
 }

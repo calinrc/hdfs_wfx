@@ -29,7 +29,7 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -DLINUX -I../include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux $(COMPILE_OPTIMIZE_PARAMS) -Wall -c -fmessage-length=0 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++ -DLINUX $(DEBUG_FLAG) -I../include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux $(COMPILE_OPTIMIZE_PARAMS) -Wall -c -fmessage-length=0 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
