@@ -96,10 +96,10 @@ int HDFSAccessor::initialize()
             s_WfxPairMetIdCopyPath = env->GetMethodID(wfxPairClass, "copyPath", "(Ljava/lang/String;Ljava/lang/String;)Z");
             assert(s_WfxPairMetIdCopyPath != NULL);
 
-            s_WfxPairMetIdGetPath = env->GetMethodID(wfxPairClass, "getFile", "(Ljava/lang/String;Ljava/lang/String;)V");
+            s_WfxPairMetIdGetPath = env->GetMethodID(wfxPairClass, "getFile", "(Ljava/lang/String;Ljava/lang/String;Lorg/cgc/wfx/Progress;)V");
             assert(s_WfxPairMetIdGetPath != NULL);
 
-            s_WfxPairMetIdPutPath = env->GetMethodID(wfxPairClass, "putFile", "(Ljava/lang/String;Ljava/lang/String;Z)V");
+            s_WfxPairMetIdPutPath = env->GetMethodID(wfxPairClass, "putFile", "(Ljava/lang/String;Ljava/lang/String;ZLorg/cgc/wfx/Progress;)V");
             assert(s_WfxPairMetIdPutPath != NULL);
 
             initFileEnumerator(env);
@@ -358,7 +358,8 @@ bool HDFSAccessor::getFile(char* remotePath, char* localPath)
         jstring remotePathStr = env->NewStringUTF(remotePath);
         jstring localPathStr = env->NewStringUTF(localPath);
 
-        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdGetPath, remotePathStr, localPathStr);
+        jobject progressObject = NULL;
+        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdGetPath, remotePathStr, localPathStr, progressObject);
         if (!JVMState::instance()->exceptionExists(env))
         {
             env->DeleteLocalRef(localPathStr);
@@ -391,7 +392,8 @@ bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite)
         jstring localPathStr = env->NewStringUTF(localPath);
         jstring remotePathStr = env->NewStringUTF(remotePath);
         jboolean joverwrite = overwrite;
-        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdPutPath, localPathStr, remotePathStr, joverwrite);
+        jobject progressObject = NULL;
+        env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdPutPath, localPathStr, remotePathStr, joverwrite, progressObject);
         if (!JVMState::instance()->exceptionExists(env))
         {
             env->DeleteLocalRef(localPathStr);

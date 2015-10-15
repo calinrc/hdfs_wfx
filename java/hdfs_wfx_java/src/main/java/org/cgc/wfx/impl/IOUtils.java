@@ -13,14 +13,14 @@ public class IOUtils {
 	private IOUtils() {
 	}
 
-	public static void deplate(InputStream is, OutputStream os)
-			throws IOException {
+	public static void deplate(InputStream is, OutputStream os, FileUpdateMonitor monitor) throws IOException {
 		try {
 			byte[] buff = new byte[2 * 1024 * 1024];
 			int readBytes = 0;
 
 			while ((readBytes = is.read(buff)) > -1) {
 				os.write(buff, 0, readBytes);
+				monitor.updateMovedBytes(readBytes);
 			}
 		} finally {
 			close(is, os);

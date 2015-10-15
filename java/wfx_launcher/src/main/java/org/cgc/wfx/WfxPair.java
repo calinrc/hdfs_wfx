@@ -61,13 +61,13 @@ public interface WfxPair {
 	 * @param localPath
 	 * @return boolean
 	 */
-	void getFile(String remotePath, String localPath);
+	void getFile(String remotePath, String localPath, Progress progress);
 
 	/**
 	 * @param localPath
 	 * @param remotePath
 	 * @return boolean
 	 */
-	void putFile(String localPath, String remotePath, boolean overwrite);
+	void putFile(String localPath, String remotePath, boolean overwrite, Progress progress);
 
 }
