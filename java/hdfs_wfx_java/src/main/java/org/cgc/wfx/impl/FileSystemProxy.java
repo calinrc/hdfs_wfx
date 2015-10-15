@@ -13,7 +13,11 @@
 package org.cgc.wfx.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -192,14 +196,18 @@ public class FileSystemProxy implements WfxPair {
 		log.debug("Try to get path " + remotePath + " to local path "
 				+ localPath);
 		Path fRemotePath = new Path(remotePath);
-		Path fLocalPath = new Path(localPath);
+		InputStream in = null;
+		OutputStream out = null;
 		try {
-			this.fileSystem.copyToLocalFile(false, fRemotePath, fLocalPath,
-					true);
+			in = this.fileSystem.open(fRemotePath);
+			out = new FileOutputStream(new File(localPath));
+			IOUtils.deplate(in, out);
 		} catch (IOException ioEx) {
 			log.error("FAIL on getting path " + fRemotePath + " to local path "
-					+ fLocalPath, ioEx);
+					+ localPath, ioEx);
 			throw new WfxHdfsException(ioEx);
+		} finally {
+			IOUtils.close(in, out);
 		}
 	}
 
@@ -207,15 +215,20 @@ public class FileSystemProxy implements WfxPair {
 	public void putFile(String localPath, String remotePath, boolean overwrite) {
 		log.debug("Try to get path " + remotePath + " to local path "
 				+ localPath);
-		Path fLocalPath = new Path(localPath);
 		Path fRemotePath = new Path(remotePath);
+		InputStream in = null;
+		OutputStream out = null;
 		try {
-			this.fileSystem.copyFromLocalFile(false, overwrite, fLocalPath,
-					fRemotePath);
+			log.info("Use deplate method for put file");
+			in = new FileInputStream(new File(localPath));
+			out = this.fileSystem.create(fRemotePath, overwrite);
+			IOUtils.deplate(in, out);
 		} catch (IOException ioEx) {
 			log.error("FAIL on putting path " + fRemotePath + " to local path "
-					+ fLocalPath, ioEx);
+					+ localPath, ioEx);
 			throw new WfxHdfsException(ioEx);
+		} finally {
+			IOUtils.close(in, out);
 		}
 	}
 
