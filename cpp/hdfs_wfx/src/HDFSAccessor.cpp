@@ -349,7 +349,7 @@ bool HDFSAccessor::copy(char* srcPath, char* destPath)
 }
 
 
-bool HDFSAccessor::getFile(char* remotePath, char* localPath)
+bool HDFSAccessor::getFile(char* remotePath, char* localPath, ProgressStructure* progressInfo)
 {
     bool isNewEnv = false;
     JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
@@ -383,7 +383,7 @@ bool HDFSAccessor::getFile(char* remotePath, char* localPath)
     return false;
 }
 
-bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite)
+bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite, ProgressStructure* progressInfo)
 {
     bool isNewEnv = false;
     JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);

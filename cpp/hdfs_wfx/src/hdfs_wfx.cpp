@@ -140,7 +140,7 @@ int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, Remote
 int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)
 {
     LOGGING("FsGetFile from %s to %s wiht copy flags %d", RemoteName, LocalName, CopyFlags);
-    bool success = HDFSAccessor::instance()->getFile(RemoteName, LocalName);
+    bool success = HDFSAccessor::instance()->getFile(RemoteName, LocalName, NULL);
     return success ? FS_FILE_OK : FS_FILE_READERROR;
 
     //FS_FILE_READERROR, FS_FILE_USERABORT, FS_FILE_NOTFOUND, FS_FILE_NOTSUPPORTED
@@ -149,7 +149,7 @@ int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
     LOGGING("FsPutFile Local path %s in HDFS path %s with flags %d", LocalName, RemoteName, CopyFlags);
-    bool success = HDFSAccessor::instance()->putFile(LocalName, RemoteName, true);
+    bool success = HDFSAccessor::instance()->putFile(LocalName, RemoteName, true, NULL);
     return success ? FS_FILE_OK : FS_FILE_WRITEERROR;
 }
 

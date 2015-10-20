@@ -16,6 +16,8 @@
 #include "FileEnumerator.h"
 #include <jni.h>
 
+class ProgressStructure;
+
 class HDFSAccessor
 {
 
@@ -38,9 +40,9 @@ public:
 
     bool copy(char* srcPath, char* destPath);
 
-    bool getFile(char* remotePath, char* localPath);
+    bool getFile(char* remotePath, char* localPath, ProgressStructure* progressInfo);
 
-    bool putFile(char* localPath, char* remotePath, bool overwrite);
+    bool putFile(char* localPath, char* remotePath, bool overwrite, ProgressStructure* progressInfo);
 
 
 private:
