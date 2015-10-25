@@ -8,21 +8,27 @@ CPP_SRCS += \
 ../src/HDFSAccessor.cpp \
 ../src/JVMState.cpp \
 ../src/Logger.cpp \
-../src/hdfs_wfx.cpp 
+../src/ProgressInfo.cpp \
+../src/hdfs_wfx.cpp \
+../src/org_cgc_wfx_NativeProgress.cpp 
 
 OBJS += \
 ./src/FileEnumerator.o \
 ./src/HDFSAccessor.o \
 ./src/JVMState.o \
 ./src/Logger.o \
-./src/hdfs_wfx.o 
+./src/ProgressInfo.o \
+./src/hdfs_wfx.o \
+./src/org_cgc_wfx_NativeProgress.o 
 
 CPP_DEPS += \
 ./src/FileEnumerator.d \
 ./src/HDFSAccessor.d \
 ./src/JVMState.d \
 ./src/Logger.d \
-./src/hdfs_wfx.d 
+./src/ProgressInfo.d \
+./src/hdfs_wfx.d \
+./src/org_cgc_wfx_NativeProgress.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

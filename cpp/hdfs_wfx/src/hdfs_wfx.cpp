@@ -143,7 +143,7 @@ int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, Remote
 int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)
 {
     LOGGING("FsGetFile from %s to %s wiht copy flags %d", RemoteName, LocalName, CopyFlags);
-    ProgressInfo* progressInfo = NULL;//new ProgressInfo(RemoteName, LocalName, gProgressProc, gPluginNo);
+    ProgressInfo* progressInfo = new ProgressInfo(RemoteName, LocalName, gProgressProc, gPluginNo);
     bool success = HDFSAccessor::instance()->getFile(RemoteName, LocalName, progressInfo);
     delete progressInfo;
     return success ? FS_FILE_OK : FS_FILE_READERROR;
@@ -154,7 +154,7 @@ int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
     LOGGING("FsPutFile Local path %s in HDFS path %s with flags %d", LocalName, RemoteName, CopyFlags);
-    ProgressInfo* progressInfo = NULL;//new ProgressInfo(LocalName, RemoteName, gProgressProc, gPluginNo);
+    ProgressInfo* progressInfo = new ProgressInfo(LocalName, RemoteName, gProgressProc, gPluginNo);
     bool success = HDFSAccessor::instance()->putFile(LocalName, RemoteName, true, progressInfo);
     delete progressInfo;
     return success ? FS_FILE_OK : FS_FILE_WRITEERROR;

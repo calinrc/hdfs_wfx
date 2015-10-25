@@ -57,13 +57,18 @@ hdfs_wfx.wfx: $(OBJS) $(USER_OBJS)
 	g++ -shared -o "hdfs_wfx.wfx" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
+	$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
 	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) hdfs_wfx.wfx
 	-@echo ' '
 
+post-build:
+	-cp -f hdfs_wfx.wfx ${HOME}/.config/doublecmd/plugins/hdfs_wfx/
+	-@echo ' '
+
 .PHONY: all clean dependents
-.SECONDARY:
+.SECONDARY: post-build
 
 -include ../makefile.targets

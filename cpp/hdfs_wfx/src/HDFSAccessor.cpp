@@ -19,6 +19,7 @@
 #include <string>
 #include <string.h>
 #include <set>
+#include "ProgressInfo.h"
 
 HDFSAccessor* HDFSAccessor::s_instance = new HDFSAccessor();
 jmethodID HDFSAccessor::s_WfxPairMetIdInitFS = NULL;
@@ -62,13 +63,16 @@ int HDFSAccessor::initialize()
         Utilities::getJavaDependenciesPath(dependenciesPath, &pathSize);
 
         jclass wfxLauncherClass = env->FindClass("org/cgc/wfx/FSClientLauncher");
+
         if (JVMState::instance()->exceptionExists(env) || wfxLauncherClass == NULL)
         {
             LOGGING("Unable to find Java launcher jar %s", JAVA_LAUNCHER_VAL)
             assert(false);
         }
+
         jstring depsPathStr = env->NewStringUTF(dependenciesPath);
-        jmethodID getPairInstanceMethodId = env->GetStaticMethodID(wfxLauncherClass, "getPairInstance", "(Ljava/lang/String;)Lorg/cgc/wfx/WfxPair;");
+        jmethodID getPairInstanceMethodId = env->GetStaticMethodID(wfxLauncherClass, "getPairInstance",
+                                                                   "(Ljava/lang/String;)Lorg/cgc/wfx/WfxPair;");
         assert(getPairInstanceMethodId != NULL);
 
         jobject wfxPairObj = env->CallStaticObjectMethod(wfxLauncherClass, getPairInstanceMethodId, depsPathStr);
@@ -83,7 +87,8 @@ int HDFSAccessor::initialize()
             s_WfxPairMetIdGetFolderContent = env->GetMethodID(wfxPairClass, "getFolderContent", "(Ljava/lang/String;)[Ljava/lang/String;");
             assert(s_WfxPairMetIdGetFolderContent != NULL);
 
-            s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation", "(Ljava/lang/String;Ljava/lang/String;)Lorg/cgc/wfx/FileInformation;");
+            s_WfxPairMetIdGetFileInfo = env->GetMethodID(wfxPairClass, "getFileInformation",
+                                                         "(Ljava/lang/String;Ljava/lang/String;)Lorg/cgc/wfx/FileInformation;");
             assert(s_WfxPairMetIdGetFileInfo != NULL);
 
             s_WfxPairMetIdMkDir = env->GetMethodID(wfxPairClass, "mkDir", "(Ljava/lang/String;)Z");
@@ -98,10 +103,12 @@ int HDFSAccessor::initialize()
             s_WfxPairMetIdCopyPath = env->GetMethodID(wfxPairClass, "copyPath", "(Ljava/lang/String;Ljava/lang/String;)Z");
             assert(s_WfxPairMetIdCopyPath != NULL);
 
-            s_WfxPairMetIdGetPath = env->GetMethodID(wfxPairClass, "getFile", "(Ljava/lang/String;Ljava/lang/String;Lorg/cgc/wfx/Progress;)V");
+            s_WfxPairMetIdGetPath = env->GetMethodID(wfxPairClass, "getFile",
+                                                     "(Ljava/lang/String;Ljava/lang/String;Lorg/cgc/wfx/Progress;)V");
             assert(s_WfxPairMetIdGetPath != NULL);
 
-            s_WfxPairMetIdPutPath = env->GetMethodID(wfxPairClass, "putFile", "(Ljava/lang/String;Ljava/lang/String;ZLorg/cgc/wfx/Progress;)V");
+            s_WfxPairMetIdPutPath = env->GetMethodID(wfxPairClass, "putFile",
+                                                     "(Ljava/lang/String;Ljava/lang/String;ZLorg/cgc/wfx/Progress;)V");
             assert(s_WfxPairMetIdPutPath != NULL);
 
             initFileEnumerator(env);
@@ -162,6 +169,7 @@ void HDFSAccessor::initFileEnumerator(JNIEnv* env)
         assert(s_FileInfoGetFileSize != NULL);
         s_FileInfoGetReserved0 = env->GetMethodID(wfxFileInformationClass, "getReserved0", "()J");
         assert(s_FileInfoGetReserved0 != NULL);
+        env->DeleteLocalRef(wfxFileInformationClass);
     } else
     {
         assert(false);
