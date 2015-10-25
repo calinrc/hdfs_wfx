@@ -16,7 +16,7 @@
 #include "FileEnumerator.h"
 #include <jni.h>
 
-class ProgressStructure;
+class ProgressInfo;
 
 class HDFSAccessor
 {
@@ -40,17 +40,19 @@ public:
 
     bool copy(char* srcPath, char* destPath);
 
-    bool getFile(char* remotePath, char* localPath, ProgressStructure* progressInfo);
+    bool getFile(char* remotePath, char* localPath, ProgressInfo* progressInfo);
 
-    bool putFile(char* localPath, char* remotePath, bool overwrite, ProgressStructure* progressInfo);
+    bool putFile(char* localPath, char* remotePath, bool overwrite, ProgressInfo* progressInfo);
 
 
 private:
     HDFSAccessor();
     virtual ~HDFSAccessor();
     void initFileEnumerator(JNIEnv* env);
+    void initProgressInfo(JNIEnv* env);
 
     jobject m_wfxPairObj;
+    jclass m_nativeProgressClass;
     bool m_initialized;
 
     static HDFSAccessor* s_instance;
@@ -65,6 +67,8 @@ public:
     static jmethodID s_WfxPairMetIdCopyPath;
     static jmethodID s_WfxPairMetIdGetPath;
     static jmethodID s_WfxPairMetIdPutPath;
+
+    static jmethodID s_NativeProgressConstructor;
 
     static jmethodID s_FileInfoGetFileAttributes;
     static jmethodID s_FileInfoGetFileCreationTime;

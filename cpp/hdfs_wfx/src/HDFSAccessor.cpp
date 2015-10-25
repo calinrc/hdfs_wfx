@@ -31,6 +31,8 @@ jmethodID HDFSAccessor::s_WfxPairMetIdCopyPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdGetPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdPutPath = NULL;
 
+jmethodID HDFSAccessor::s_NativeProgressConstructor = NULL;
+
 jmethodID HDFSAccessor::s_FileInfoGetFileAttributes = NULL;
 jmethodID HDFSAccessor::s_FileInfoGetFileCreationTime = NULL;
 jmethodID HDFSAccessor::s_FileInfoGetFileLastAccessTime = NULL;
@@ -38,7 +40,7 @@ jmethodID HDFSAccessor::s_FileInfoGetFileSize = NULL;
 jmethodID HDFSAccessor::s_FileInfoGetReserved0 = NULL;
 
 HDFSAccessor::HDFSAccessor() :
-        m_wfxPairObj(NULL), m_initialized(false)
+        m_wfxPairObj(NULL), m_nativeProgressClass(NULL), m_initialized(false)
 {
 
 }
@@ -59,7 +61,7 @@ int HDFSAccessor::initialize()
         JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
         Utilities::getJavaDependenciesPath(dependenciesPath, &pathSize);
 
-        jclass wfxLauncherClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/FSClientLauncher"));
+        jclass wfxLauncherClass = env->FindClass("org/cgc/wfx/FSClientLauncher");
         if (JVMState::instance()->exceptionExists(env) || wfxLauncherClass == NULL)
         {
             LOGGING("Unable to find Java launcher jar %s", JAVA_LAUNCHER_VAL)
@@ -104,6 +106,8 @@ int HDFSAccessor::initialize()
 
             initFileEnumerator(env);
 
+            initProgressInfo(env);
+
             if (!JVMState::instance()->exceptionExists(env))
             {
                 m_wfxPairObj = env->NewGlobalRef(wfxPairObj);
@@ -145,7 +149,7 @@ int HDFSAccessor::initialize()
 
 void HDFSAccessor::initFileEnumerator(JNIEnv* env)
 {
-    jclass wfxFileInformationClass = static_cast<jclass>(env->FindClass("org/cgc/wfx/FileInformation"));
+    jclass wfxFileInformationClass = env->FindClass("org/cgc/wfx/FileInformation");
     if (!JVMState::instance()->exceptionExists(env))
     {
         s_FileInfoGetFileAttributes = env->GetMethodID(wfxFileInformationClass, "getFileAttributes", "()J");
@@ -164,6 +168,21 @@ void HDFSAccessor::initFileEnumerator(JNIEnv* env)
     }
 }
 
+void HDFSAccessor::initProgressInfo(JNIEnv* env)
+{
+    jclass wfxProgressInfoClass = env->FindClass("org/cgc/wfx/NativeProgress");
+    if (!JVMState::instance()->exceptionExists(env))
+    {
+        m_nativeProgressClass = static_cast<jclass>(env->NewGlobalRef(wfxProgressInfoClass));
+        s_NativeProgressConstructor = env->GetMethodID(wfxProgressInfoClass, "<init>", "(J)V");
+        assert(s_NativeProgressConstructor != NULL);
+    } else
+    {
+        assert(false);
+    }
+
+}
+
 void HDFSAccessor::release()
 {
     bool isNewEnv = false;
@@ -172,6 +191,11 @@ void HDFSAccessor::release()
     {
         env->DeleteGlobalRef(m_wfxPairObj);
         m_wfxPairObj = NULL;
+    }
+    if (m_nativeProgressClass != NULL)
+    {
+        env->DeleteGlobalRef(m_nativeProgressClass);
+        m_nativeProgressClass = NULL;
     }
     if (isNewEnv)
     {
@@ -315,7 +339,6 @@ bool HDFSAccessor::rename(char* oldPath, char* newPath)
     return false;
 }
 
-
 bool HDFSAccessor::copy(char* srcPath, char* destPath)
 {
     bool isNewEnv = false;
@@ -348,8 +371,7 @@ bool HDFSAccessor::copy(char* srcPath, char* destPath)
     return false;
 }
 
-
-bool HDFSAccessor::getFile(char* remotePath, char* localPath, ProgressStructure* progressInfo)
+bool HDFSAccessor::getFile(char* remotePath, char* localPath, ProgressInfo* progressInfo)
 {
     bool isNewEnv = false;
     JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
@@ -359,11 +381,15 @@ bool HDFSAccessor::getFile(char* remotePath, char* localPath, ProgressStructure*
         jstring localPathStr = env->NewStringUTF(localPath);
 
         jobject progressObject = NULL;
+        jlong progressInfoAdress = (jlong) progressInfo;
+        progressObject = env->NewObject(m_nativeProgressClass, s_NativeProgressConstructor, progressInfoAdress);
+
         env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdGetPath, remotePathStr, localPathStr, progressObject);
         if (!JVMState::instance()->exceptionExists(env))
         {
             env->DeleteLocalRef(localPathStr);
             env->DeleteLocalRef(remotePathStr);
+            env->DeleteLocalRef(progressObject);
             if (isNewEnv)
             {
                 JVMState::instance()->releaseEnv();
@@ -373,6 +399,7 @@ bool HDFSAccessor::getFile(char* remotePath, char* localPath, ProgressStructure*
         {
             env->DeleteLocalRef(localPathStr);
             env->DeleteLocalRef(remotePathStr);
+            env->DeleteLocalRef(progressObject);
         }
 
     }
@@ -383,7 +410,7 @@ bool HDFSAccessor::getFile(char* remotePath, char* localPath, ProgressStructure*
     return false;
 }
 
-bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite, ProgressStructure* progressInfo)
+bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite, ProgressInfo* progressInfo)
 {
     bool isNewEnv = false;
     JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
@@ -393,11 +420,14 @@ bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite, Pr
         jstring remotePathStr = env->NewStringUTF(remotePath);
         jboolean joverwrite = overwrite;
         jobject progressObject = NULL;
+        jlong progressInfoAdress = (jlong) progressInfo;
+        progressObject = env->NewObject(m_nativeProgressClass, s_NativeProgressConstructor, progressInfoAdress);
         env->CallVoidMethod(m_wfxPairObj, s_WfxPairMetIdPutPath, localPathStr, remotePathStr, joverwrite, progressObject);
         if (!JVMState::instance()->exceptionExists(env))
         {
             env->DeleteLocalRef(localPathStr);
             env->DeleteLocalRef(remotePathStr);
+            env->DeleteLocalRef(progressObject);
             if (isNewEnv)
             {
                 JVMState::instance()->releaseEnv();
@@ -407,6 +437,7 @@ bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite, Pr
         {
             env->DeleteLocalRef(localPathStr);
             env->DeleteLocalRef(remotePathStr);
+            env->DeleteLocalRef(progressObject);
         }
 
     }

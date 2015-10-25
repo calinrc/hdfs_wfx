@@ -35,12 +35,6 @@ enum JVMStateEnum
     JVMLoaded, JVMLoadFail, JVMDetached, JVMDetachFail
 };
 
-struct ProgressStructure
-{
-  char source[MAX_PATH];
-  char target[MAX_PATH];
-  void* ptr;
-  int pluginNr;
-};
+
 
 #endif /* INCLUDE_GENDEF_H_ */

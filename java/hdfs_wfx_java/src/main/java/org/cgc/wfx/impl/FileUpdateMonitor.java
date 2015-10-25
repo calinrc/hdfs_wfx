@@ -27,6 +27,7 @@ public class FileUpdateMonitor {
 	 */
 	public FileUpdateMonitor(Progress progress, long totalFileSize) {
 		this.progress = progress;
+		this.totalFileSize = totalFileSize;
 	}
 
 	/**

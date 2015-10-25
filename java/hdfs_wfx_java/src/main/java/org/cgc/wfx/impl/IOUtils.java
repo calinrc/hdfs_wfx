@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.log4j.Logger;
-
 public class IOUtils {
-	private static final Logger log = Logger.getLogger(IOUtils.class);
 
 	private IOUtils() {
 	}
