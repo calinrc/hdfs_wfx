@@ -10,23 +10,25 @@ public class NativeProgress implements Progress {
 		this.ptr = prgStructPntr;
 	}
 
-	public void notifyProgress(int progressVal) {
+	public boolean notifyProgress(int progressVal) {
 		if (this.ptr != 0 && this.ptr != -1) {
 			try {
-				notifyProgress(ptr, progressVal);
+				return notifyProgress(ptr, progressVal);
 			} catch (UnsatisfiedLinkError linkError) {
 				System.err
 						.println("Fail on calling native method. Try loading native library");
 				linkError.printStackTrace();
 				tryLoadingWfxLinbrary();
 				try {
-					notifyProgress(ptr, progressVal);
+					return notifyProgress(ptr, progressVal);
 				} catch (Throwable thr) {
 					System.err
 							.println("Final fail on sending progress notification");
+					return false;
 				}
 			}
 		}
+		return false;
 	}
 
 	private static void tryLoadingWfxLinbrary() {
@@ -45,6 +47,11 @@ public class NativeProgress implements Progress {
 
 	}
 
-	native void notifyProgress(long pointer, int progressVal);
+	/**
+	 * @param pointer
+	 * @param progressVal
+	 * @return boolean -cancel
+	 */
+	native boolean notifyProgress(long pointer, int progressVal);
 
 }

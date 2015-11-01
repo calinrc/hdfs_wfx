@@ -12,6 +12,7 @@
 
 #include "ProgressInfo.h"
 #include <string.h>
+#include "Logger.h"
 
 ProgressInfo::ProgressInfo(const char* source, const char* target, tProgressProc progressInfoExec, int pluginNo) :
         m_progressInfoExec(progressInfoExec), m_pluginNo(pluginNo)
@@ -33,10 +34,15 @@ ProgressInfo::~ProgressInfo()
 {
 }
 
-void ProgressInfo::call(int progressVal)
+bool ProgressInfo::call(int progressVal)
 {
     if (m_progressInfoExec != NULL)
     {
-        m_progressInfoExec(m_pluginNo, m_source, m_target, progressVal);
+        bool canceled =  m_progressInfoExec(m_pluginNo, m_source, m_target, progressVal) == 1;
+        if (canceled){
+            LOGGING("Operation on file %s canceled", m_source);
+        }
+        return canceled;
     }
+    return false;
 }

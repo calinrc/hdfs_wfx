@@ -22,15 +22,18 @@ public class IOUtils {
 	private IOUtils() {
 	}
 
-	public static void deplate(InputStream is, OutputStream os, FileUpdateMonitor monitor) throws IOException {
+	public static boolean deplate(InputStream is, OutputStream os,
+			FileUpdateMonitor monitor) throws IOException {
 		try {
 			byte[] buff = new byte[2 * 1024 * 1024];
 			int readBytes = 0;
 
-			while ((readBytes = is.read(buff)) > -1) {
+			boolean cancel = false;
+			while ((readBytes = is.read(buff)) > -1 && !cancel) {
 				os.write(buff, 0, readBytes);
-				monitor.updateMovedBytes(readBytes);
+				cancel = monitor.updateMovedBytes(readBytes);
 			}
+			return cancel;
 		} finally {
 			close(is, os);
 		}
@@ -40,7 +43,9 @@ public class IOUtils {
 	public static void close(Closeable... cls) {
 		for (Closeable item : cls) {
 			try {
-				item.close();
+				if (item != null) {
+					item.close();
+				}
 			} catch (Exception ex) {
 
 			}

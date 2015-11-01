@@ -33,15 +33,16 @@ public class FileUpdateMonitor {
 	/**
 	 * @param updateBitesNo
 	 */
-	public void updateMovedBytes(long updateBitesNo) {
+	public boolean updateMovedBytes(long updateBitesNo) {
 		if (this.progress != null) {
 			exchangedBites += updateBitesNo;
 			int actualProgress = (int) (exchangedBites * 100 / totalFileSize);
 			if (actualProgress > lastProgress) {
 				lastProgress = actualProgress;
-				progress.notifyProgress(lastProgress);
+				return progress.notifyProgress(lastProgress);
 			}
 		}
+		return false;
 	}
 
 }

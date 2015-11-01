@@ -3,15 +3,16 @@
 /*
  * Class:     org_cgc_wfx_NativeProgress
  * Method:    notifyProgress
- * Signature: (JI)V
+ * Signature: (JI)Z
  */
-JNIEXPORT void JNICALL Java_org_cgc_wfx_NativeProgress_notifyProgress(JNIEnv *env, jobject THIS, jlong ptr, jint progress)
+JNIEXPORT jboolean JNICALL Java_org_cgc_wfx_NativeProgress_notifyProgress(JNIEnv *env, jobject THIS, jlong ptr, jint progress)
 {
     ProgressInfo* pregressStructure = (ProgressInfo*) ptr;
     if (pregressStructure != NULL)
     {
-        pregressStructure->call(progress);
+        return pregressStructure->call(progress) == true ? JNI_TRUE : JNI_FALSE;
     }
+    return JNI_FALSE;
 
 }
 

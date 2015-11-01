@@ -22,7 +22,7 @@ public:
     ProgressInfo(const char* source, const char* target, tProgressProc progressInfoExec, int pluginNo);
     virtual ~ProgressInfo();
 
-    void call(int progressVal);
+    bool call(int progressVal);
 private:
     char m_source[MAX_PATH];
     char m_target[MAX_PATH];

@@ -10,9 +10,9 @@ extern "C" {
 /*
  * Class:     org_cgc_wfx_NativeProgress
  * Method:    notifyProgress
- * Signature: (JI)V
+ * Signature: (JI)Z
  */
-JNIEXPORT void JNICALL Java_org_cgc_wfx_NativeProgress_notifyProgress
+JNIEXPORT jboolean JNICALL Java_org_cgc_wfx_NativeProgress_notifyProgress
   (JNIEnv *, jobject, jlong, jint);
 
 #ifdef __cplusplus
