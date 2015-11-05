@@ -163,7 +163,7 @@ int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 int FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
 {
     LOGGING("FsExecuteFile %s verb %s", RemoteName, Verb);
-    return -1;
+    return FS_EXEC_OK;
 }
 
 BOOL FsDeleteFile(char* RemoteName)

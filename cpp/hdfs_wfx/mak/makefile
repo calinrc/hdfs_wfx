@@ -12,7 +12,9 @@ ifeq ($(CONFIGURATION),RELEASE)
         DEBUG_FLAG=
 endif
 
-
+ifdef BUILD_INFO
+     META_INFO=-DPREDEFINED_BUILD_NO=\"$(BUILD_INFO)\"
+endif
 
 RM := rm -rf
 

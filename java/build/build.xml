@@ -1,9 +1,14 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="build">
 	<target name="build">
-		<echo message="Start main build" />
-		<ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="build" />
-		<ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="build" />
-		<exec command="make CONFIGURATION=RELEASE" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
+		<tstamp>
+			<format property="BUILD_NO" pattern="ddMMyyyy" />
+		</tstamp>
+		<echo message="Start main build ${DSTAMP}" />
+		<ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="build">
+			<property name="DSTAMP" value="${DSTAMP}" />
+		</ant>
+		<ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="build"/>
+		<exec command="make CONFIGURATION=RELEASE BUILD_INFO=${DSTAMP} clean all" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
 		<antcall target="pack" />
 		<echo message="End main build" />
 
@@ -17,12 +22,12 @@
 		<copy file="./target/wfx_launcher/wfx_launcher.jar" todir="../../install/temp/plugins/hdfs_wfx/java" />
 		<copy file="./target/hdfs_wfx_java/hdfs_wfx.jar" todir="../../install/temp/plugins/hdfs_wfx/java/deps" />
 		<copy file="../../cpp/hdfs_wfx/mak/hdfs_wfx.wfx" todir="../../install/temp/plugins/hdfs_wfx/" />
-		
+
 		<copy file="../../install/install.xml" todir="../../install/temp" />
 		<copy todir="../../install/temp/plugins/hdfs_wfx/java/deps">
 			<fileset dir="../../install/hadoop-xmls" />
 			<fileset dir="../hdfs_wfx_java/lib">
-				<exclude name="wfx_launcher*.jar"/>
+				<exclude name="wfx_launcher*.jar" />
 			</fileset>
 		</copy>
 

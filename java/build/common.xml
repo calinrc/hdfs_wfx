@@ -40,7 +40,24 @@
 	</target>
 
 
-	<target name="build" depends="retrieve, compile, pack, publish, deploy" />
+	<target name="build" depends="retrieve, precompile, compile, postcompile, pack, publish, deploy" />
+
+	<target name="precompile" if="DSTAMP">
+		<echo message="Prepare the build ${DSTAMP}" />
+		<replace file="${basedir}/src/main/java/org/cgc/wfx/HdfsWfxVersion.java">
+			<replacetoken>DUMMY</replacetoken>
+			<replacevalue expandProperties="true">${DSTAMP}</replacevalue>
+		</replace>
+	</target>
+
+	<target name="postcompile" if="DSTAMP">
+		<echo message="Cleanup build number ${DSTAMP}" />
+		<replace file="${basedir}/src/main/java/org/cgc/wfx/HdfsWfxVersion.java">
+			<replacetoken expandProperties="true">${DSTAMP}</replacetoken>
+			<replacevalue>DUMMY</replacevalue>
+		</replace>
+	</target>
+
 
 	<target name="compile">
 		<delete dir="${basedir}/../build/target/${ant.project.name}/bin" />

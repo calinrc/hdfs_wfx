@@ -18,4 +18,8 @@ public class HdfsWfxVersion {
 		return "0.1";
 	}
 	
+	public String getBuildNumber() {
+		return "DUMMY";
+	}
+	
 }

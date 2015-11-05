@@ -13,7 +13,18 @@
 #ifndef INCLUDE_HDFSWFXVERSION_
 #define INCLUDE_HDFSWFXVERSION_
 
+#ifdef PREDEFINED_BUILD_NO
+#define BUILD_NO PREDEFINED_BUILD_NO
+#else
+#define BUILD_NO "DUMMY"
+#endif
+
+#ifdef PREDEFINED_VERSION_NO
+#define VERSION PREDEFINED_VERSION_NO
+#else
 #define VERSION "0.1"
+#endif
+
 
 class HdfsWfxVersion
 {
@@ -21,6 +32,11 @@ class HdfsWfxVersion
     static const char* GetVersion()
     {
         return VERSION;
+    }
+
+    static const char* GetBuildNumber()
+    {
+        return BUILD_NO;
     }
 };
 
