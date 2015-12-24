@@ -15,8 +15,10 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#ifdef LINUX
 #include <pwd.h>
 #include <unistd.h>
+#endif
 #include "gendef.h"
 #include <sys/stat.h>
 #include <string.h>
@@ -26,12 +28,13 @@ class Utilities
 public:
     static const char* getUserHomeDir()
     {
-        const char *homedir;
-
+        const char *homedir=NULL;
+#ifdef LINUX
         if ((homedir = getenv("HOME")) == NULL)
         {
             homedir = getpwuid(getuid())->pw_dir;
         }
+#endif
         return homedir;
 
     }
@@ -42,7 +45,9 @@ public:
 
         if (stat(path, &st) == -1)
         {
+#ifdef LINUX
             mkdir(path, 0700);
+#endif
         }
     }
 

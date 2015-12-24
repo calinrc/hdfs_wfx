@@ -14,10 +14,12 @@
 #include <jni.h>
 #include "Logger.h"
 #include <stdlib.h>
+#ifdef LINUX
 #include <dlfcn.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#endif
 #include <string.h>
 #include "Utilities.h"
 #include <assert.h>
@@ -119,6 +121,7 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
                 //found in default Oracle, OpenJDK places
                 foundJvm = true;
             }
+#ifdef LINUX
             if (foundJvm)
             {
                 LOGGING("Try loading JVM dynamic library...");
@@ -148,6 +151,7 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
                     assert(false);
                 }
             }
+#endif
 
         } else
         {
@@ -217,7 +221,9 @@ JVMStateEnum JVMState::detach()
     }
     if (m_handle != NULL)
     {
+#ifdef LINUX
         dlclose(m_handle);
+#endif
         m_handle = NULL;
     }
     m_initialized = false;

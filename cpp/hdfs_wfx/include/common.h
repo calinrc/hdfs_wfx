@@ -1,10 +1,9 @@
-#ifdef __GNUC__
-
-#include <stdint.h>
-
 #ifndef WFX_COMMON_H
 #define WFX_COMMON_H
 
+#ifdef __GNUC__
+
+#include <stdint.h>
 
 #if defined(__WIN32__) || defined(_WIN32) || defined(_WIN64)
   #define DCPCALL __attribute__((stdcall))
@@ -64,13 +63,11 @@ typedef struct _WIN32_FIND_DATAW {
 #else
 
 #if defined(_WIN32) || defined(_WIN64)
+  #include <windows.h>
   #define DCPCALL __stdcall
-#elif not defined (LINUX)
-  #define DCPCALL __cdecl
 #else
-  #define DCPCALL
+  #define DCPCALL __cdecl
 #endif
 
-
+#endif
 #endif //WFX_COMMON_H
-#endif

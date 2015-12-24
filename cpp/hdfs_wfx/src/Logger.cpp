@@ -13,12 +13,15 @@
 #include "Logger.h"
 #include <fcntl.h>
 #include <stdarg.h>
-#include <sys/time.h>
-#include <time.h>
 
+#ifdef LINUX
+#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include <pwd.h>
+#endif
+
+#include <stdlib.h>
 #include <string.h>
 #include "Utilities.h"
 
@@ -113,8 +116,10 @@ char* Logger::buildMessage(const char* msg, va_list argList)
     char* buff = new char[count];
     char * cBuff = new char[count];
 
+#ifdef LINUX
     time_t zaman;
     struct tm *ltime;
+
     static struct timeval _t;
     static struct timezone tz;
 
@@ -124,7 +129,7 @@ char* Logger::buildMessage(const char* msg, va_list argList)
 
     strftime(cBuff, count, "%d.%m.%y %H:%M:%S", ltime);
     sprintf(cBuff, "%s.%d - %s", cBuff, (int) _t.tv_usec, msg);
-
+#endif
     len = vsnprintf(buff, count - 1, cBuff, argList);
     if (len >= count)
     {

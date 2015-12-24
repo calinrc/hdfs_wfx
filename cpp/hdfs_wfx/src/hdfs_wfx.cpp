@@ -44,7 +44,7 @@ int gPluginNo;
 char logPath[MAX_PATH];
 size_t pathSize = MAX_PATH;
 
-int FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
+int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
     gProgressProc = pProgressProc;
     gRequestProc = pRequestProc;
