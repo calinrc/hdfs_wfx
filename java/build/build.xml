@@ -1,48 +1,74 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="./" default="build" name="build">
-	<target name="build">
-		<tstamp>
-			<format property="BUILD_NO" pattern="ddMMyyyy" />
-		</tstamp>
-		<echo message="Start main build ${DSTAMP}" />
-		<ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="build">
-			<property name="DSTAMP" value="${DSTAMP}" />
-		</ant>
-		<ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="build"/>
-		<exec command="make CONFIGURATION=RELEASE BUILD_INFO=${DSTAMP} clean all" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
-		<antcall target="pack" />
-		<echo message="End main build" />
+    <target name="build" depends="build_no">
+        <echo message="Start main build ${DSTAMP}" />
+        <antcall target="java_build" />
+        <antcall target="native_build" />
+        <antcall target="pack" />
+        <echo message="End main build" />
+    </target>
 
-	</target>
+    <target name="build_no">
+        <tstamp>
+            <format property="BUILD_NO" pattern="ddMMyyyy" />
+        </tstamp>
+    </target>
 
-	<target name="pack">
-		<echo message="Start packing things ..." />
-		<mkdir dir="../../install/temp/plugins/hdfs_wfx/java/deps" />
-		<mkdir dir="../../install/temp/plugins/hdfs_wfx/logs" />
-		<copy file="../wfx_launcher/log4j-release.xml" tofile="../../install/temp/plugins/hdfs_wfx/java/log4j.xml" />
-		<copy file="./target/wfx_launcher/wfx_launcher.jar" todir="../../install/temp/plugins/hdfs_wfx/java" />
-		<copy file="./target/hdfs_wfx_java/hdfs_wfx.jar" todir="../../install/temp/plugins/hdfs_wfx/java/deps" />
-		<copy file="../../cpp/hdfs_wfx/mak/hdfs_wfx.wfx" todir="../../install/temp/plugins/hdfs_wfx/" />
+    <target name="java_build" depends="build_no">
+        <echo message="Start java build ${DSTAMP}" />
+        <ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="build">
+            <property name="DSTAMP" value="${DSTAMP}" />
+        </ant>
+        <ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="build" />
+    </target>
 
-		<copy file="../../install/install.xml" todir="../../install/temp" />
-		<copy todir="../../install/temp/plugins/hdfs_wfx/java/deps">
-			<fileset dir="../../install/hadoop-xmls" />
-			<fileset dir="../hdfs_wfx_java/lib">
-				<exclude name="wfx_launcher*.jar" />
-			</fileset>
-		</copy>
+    <target name="native_build">
+        <condition property="is_windows">
+            <os family="windows" />
+        </condition>
 
-		<delete file="../../install/hdfs_wfx.zip" />
-		<zip destfile="../../install/hdfs_wfx.zip" basedir="../../install/temp" />
-		<delete dir="../../install/temp" />
+        <antcall target="windows_build" />
+        <antcall target="linux_build" />
+    </target>
 
-	</target>
+    <target name="windows_build" if="is_windows">
+        <echo message="Running Windows build"/>
+    </target>
 
-	<target name="clean">
-		<echo message="Start clean main build" />
-		<delete dir="../../install/temp" />
-		<ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="clean" />
-		<ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="clean" />
-		<exec command="make clean CONFIGURATION=RELEASE" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
-		<echo message="End clean main build" />
-	</target>
+    <target name="linux_build" unless="is_windows">
+        <echo message="Running Linux build"/>
+        <exec command="make CONFIGURATION=RELEASE BUILD_INFO=${DSTAMP} clean all" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
+    </target>
+
+
+    <target name="pack">
+        <echo message="Start packing things ..." />
+        <mkdir dir="../../install/temp/plugins/hdfs_wfx/java/deps" />
+        <mkdir dir="../../install/temp/plugins/hdfs_wfx/logs" />
+        <copy file="../wfx_launcher/log4j-release.xml" tofile="../../install/temp/plugins/hdfs_wfx/java/log4j.xml" />
+        <copy file="./target/wfx_launcher/wfx_launcher.jar" todir="../../install/temp/plugins/hdfs_wfx/java" />
+        <copy file="./target/hdfs_wfx_java/hdfs_wfx.jar" todir="../../install/temp/plugins/hdfs_wfx/java/deps" />
+        <copy file="../../cpp/hdfs_wfx/mak/hdfs_wfx.wfx" todir="../../install/temp/plugins/hdfs_wfx/" />
+
+        <copy file="../../install/install.xml" todir="../../install/temp" />
+        <copy todir="../../install/temp/plugins/hdfs_wfx/java/deps">
+            <fileset dir="../../install/hadoop-xmls" />
+            <fileset dir="../hdfs_wfx_java/lib">
+                <exclude name="wfx_launcher*.jar" />
+            </fileset>
+        </copy>
+
+        <delete file="../../install/hdfs_wfx.zip" />
+        <zip destfile="../../install/hdfs_wfx.zip" basedir="../../install/temp" />
+        <delete dir="../../install/temp" />
+
+    </target>
+
+    <target name="clean">
+        <echo message="Start clean main build" />
+        <delete dir="../../install/temp" />
+        <ant inheritAll="false" antfile="../wfx_launcher/build.xml" target="clean" />
+        <ant inheritAll="false" antfile="../hdfs_wfx_java/build.xml" target="clean" />
+        <exec command="make clean CONFIGURATION=RELEASE" dir="${basedir}/../../cpp/hdfs_wfx/mak" />
+        <echo message="End clean main build" />
+    </target>
 </project>

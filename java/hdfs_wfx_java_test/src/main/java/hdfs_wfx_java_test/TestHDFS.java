@@ -25,7 +25,8 @@ public class TestHDFS {
 		try {
 			String homePath = System.getProperty("user.home");
 
-			WfxPair pair = FSClientLauncher.getPairInstance(homePath + File.separatorChar + Constants.DEPENDENCIES_PATH);
+			WfxPair pair = FSClientLauncher
+					.getPairInstance(homePath + File.separatorChar + Constants.DEPENDENCIES_PATH);
 			System.out.println("Init");
 			pair.initFS();
 			String[] content = pair.getFolderContent("/");
@@ -42,7 +43,8 @@ public class TestHDFS {
 
 			pair.deletePath(newFolderPath);
 
-			String newFolderWithoutParent = "/user/newFolderUnexist_" + (currentTimeMillis + 1) + "/folder2_" + (currentTimeMillis + 2);
+			String newFolderWithoutParent = "/user/newFolderUnexist_" + (currentTimeMillis + 1) + "/folder2_"
+					+ (currentTimeMillis + 2);
 			System.out.println("Try to create folder2 " + newFolderWithoutParent);
 			pair.mkDir(newFolderWithoutParent);
 
@@ -52,9 +54,10 @@ public class TestHDFS {
 			pair.renamePath("/user/folderToRename", "/user/folderToRenameChanged_" + System.currentTimeMillis());
 
 			pair.mkDir("/user/upload");
-			pair.putFile(homePath + File.separatorChar + ".bashrc", "/user/upload", true, null);
+			pair.putFile(homePath + File.separatorChar + ".config/doublecmd/plugins/hdfs_wfx/java/log4j.xml",
+					"/user/upload/log4j.xml", true, null);
 
-			pair.getFile("/user/upload/.bashrc", new File(".").getAbsolutePath() + File.separatorChar + ".cucu", null);
+			pair.getFile("/user/upload/log4j.xml", new File(".").getAbsolutePath() + File.separatorChar + ".cucu", null);
 
 			Runtime runtime = Runtime.getRuntime();
 
