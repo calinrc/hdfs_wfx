@@ -164,8 +164,12 @@ extern "C" {
 #define FS_CRYPTOPT_MASTERPASS_SET 1   // The user already has a master password defined
 
 // flags for FsFindFirst/FsFindNext
+#ifdef __GNUC__
 
-#define FILE_ATTRIBUTE_DIRECTORY 16
+#define FILE_ATTRIBUTE_DIRECTORY 0x00000010
+
+#endif //__GNUC__
+
 
 #define FILE_ATTRIBUTE_REPARSE_POINT 0x00000400
 

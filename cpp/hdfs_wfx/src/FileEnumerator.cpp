@@ -86,7 +86,7 @@ void FileEnumerator::getFileInfoContent(JNIEnv* env, jobject fileInfoItem, strin
 
     strncpy(findData->cFileName, itemName.c_str(), MAX_PATH);
     jlong fileAttributes = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileAttributes);
-    findData->dwFileAttributes = fileAttributes;
+    findData->dwFileAttributes = (DWORD)fileAttributes;
     jlong fileCreationTime = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetFileCreationTime);
     findData->ftCreationTime.dwLowDateTime = (DWORD) fileCreationTime;
     findData->ftCreationTime.dwHighDateTime = fileCreationTime >> 32;
@@ -105,7 +105,7 @@ void FileEnumerator::getFileInfoContent(JNIEnv* env, jobject fileInfoItem, strin
 
     jlong reserved0Val = env->CallLongMethod(fileInfoItem, HDFSAccessor::s_FileInfoGetReserved0);
 
-    findData->dwReserved0 = reserved0Val;
+    findData->dwReserved0 = (DWORD)reserved0Val;
 
 }
 

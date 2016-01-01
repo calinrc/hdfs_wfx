@@ -238,7 +238,7 @@ bool JVMState::exceptionExists(JNIEnv* env)
         env->ExceptionDescribe();
         env->ExceptionClear();
     }
-    return exceptionExists;
+    return exceptionExists == JNI_TRUE;
 }
 
 JVMState* JVMState::instance()

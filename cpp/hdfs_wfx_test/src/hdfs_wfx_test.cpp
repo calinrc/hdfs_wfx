@@ -13,7 +13,9 @@
 #include <iostream>
 #include "wfxplugin.h"
 #include <string.h>
+#ifdef LINUX
 #include <dlfcn.h>
+#endif
 #include <stdio.h>
 
 using namespace std;
@@ -38,6 +40,7 @@ int main()
     cout << "Begin" << endl; // prints !!!Hello World!!!
     char name[100];
 
+#ifdef LINUX
     void* handle = dlopen("../hdfs_wfx/Debug/hdfs_wfx.wfx", RTLD_LAZY);
 
     FsGetDefRootName_func FsGetDefRootName = (FsGetDefRootName_func) dlsym(handle, "FsGetDefRootName");
@@ -46,7 +49,14 @@ int main()
     FsFindFirst_func FsFindFirst = (FsFindFirst_func) dlsym(handle, "FsFindFirst");
     FsFindNext_func FsFindNext = (FsFindNext_func) dlsym(handle, "FsFindNext");
     FsFindClose_func FsFindClose = (FsFindClose_func) dlsym(handle, "FsFindClose");
-
+#else
+	FsGetDefRootName_func FsGetDefRootName = NULL;
+	FsInit_func FsInit = NULL;
+	FsSetDefaultParams_func FsSetDefaultParams = NULL;
+	FsFindFirst_func FsFindFirst = NULL;
+	FsFindNext_func FsFindNext = NULL;
+	FsFindClose_func FsFindClose = NULL;
+#endif 
     FsGetDefRootName(name, 100);
 
     cout << "Plugin Name: " << name << endl;

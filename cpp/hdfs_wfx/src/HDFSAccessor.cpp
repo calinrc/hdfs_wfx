@@ -274,7 +274,7 @@ bool HDFSAccessor::mkdir(char* path)
             {
                 JVMState::instance()->releaseEnv();
             }
-            return retVal;
+            return retVal == JNI_TRUE;
         } else
         {
             env->DeleteLocalRef(pathStr);
@@ -302,7 +302,7 @@ bool HDFSAccessor::deletePath(char* path)
             {
                 JVMState::instance()->releaseEnv();
             }
-            return retVal;
+            return retVal == JNI_TRUE;
         } else
         {
             env->DeleteLocalRef(pathStr);
@@ -332,7 +332,7 @@ bool HDFSAccessor::rename(char* oldPath, char* newPath)
             {
                 JVMState::instance()->releaseEnv();
             }
-            return retVal;
+            return retVal == JNI_TRUE;
         } else
         {
             env->DeleteLocalRef(oldPathStr);
@@ -364,7 +364,7 @@ bool HDFSAccessor::copy(char* srcPath, char* destPath)
             {
                 JVMState::instance()->releaseEnv();
             }
-            return retVal;
+            return retVal == JNI_TRUE;
         } else
         {
             env->DeleteLocalRef(srcPathStr);

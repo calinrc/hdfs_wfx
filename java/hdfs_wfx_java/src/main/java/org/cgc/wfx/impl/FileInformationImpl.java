@@ -19,7 +19,7 @@ import org.cgc.wfx.FileInformation;
 
 public class FileInformationImpl implements FileInformation {
 	private static final long FILE_ATTRIBUTE_UNIX_MODE = 0x80000000;
-	private static final long FILE_ATTRIBUTE_DIRECTORY = 16;
+	private static final long FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
 
 	private static int S_IFDIR = 0040000;
 	private static int S_IFLNK = 0120000;
