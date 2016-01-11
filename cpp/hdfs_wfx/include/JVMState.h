@@ -39,7 +39,7 @@ private:
 
     static JVMState* s_instance;
     bool m_initialized;
-    void* m_handle;
+	LIB_HANDLER m_handle;
     JavaVM* m_jvm;
 };
 

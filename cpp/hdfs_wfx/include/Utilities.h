@@ -18,25 +18,50 @@
 #ifdef LINUX
 #include <pwd.h>
 #include <unistd.h>
+#else
+#include <Shlobj.h>
 #endif
 #include "gendef.h"
 #include <sys/stat.h>
 #include <string.h>
 
+
 class Utilities
 {
 public:
-    static const char* getUserHomeDir()
+    static char* getUserHomeDir()
     {
-        const char *homedir=NULL;
+        char *homedir= new char[MAX_PATH];
 #ifdef LINUX
-        if ((homedir = getenv("HOME")) == NULL)
+		const char* homeDirVar = NULL;
+        if ((homeDirVar = getenv("HOME")) == NULL)
         {
-            homedir = getpwuid(getuid())->pw_dir;
+			homeDirVar = getpwuid(getuid())->pw_dir;
         }
+		if (homeDirVar != NULL) 
+		{
+			strcpy(homedir, homeDirVar);
+			return homedir;
+		}
+		else 
+		{
+			delete[] homedir;
+			return NULL;
+		}
+		
+#else
+		if (SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, homedir) == S_OK)
+		{
+			return homedir;
+		}else if (SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, homedir) == S_OK)
+		{
+			return homedir;
+		}else
+		{
+			delete[] homedir;
+			return NULL;
+		}
 #endif
-        return homedir;
-
     }
 
     static void mkDirectory(const char* path)
@@ -47,6 +72,8 @@ public:
         {
 #ifdef LINUX
             mkdir(path, 0700);
+#else
+			CreateDirectory(path, NULL);
 #endif
         }
     }
@@ -93,19 +120,30 @@ private:
     static char* getAbsolutePath(const char* relativePath, char* retPath, size_t* size)
     {
         char path[MAX_PATH];
-        sprintf(path, "%s/%s", getUserHomeDir(), relativePath);
-        size_t length = strlen(path);
+		char* userHomeDir = getUserHomeDir();
+		if (userHomeDir != NULL)
+		{
+			sprintf(path, "%s/%s", userHomeDir, relativePath);
+			delete[] userHomeDir;
+			size_t length = strlen(path);
 
-        if (length < *size - 1)
-        {
-            *size = length;
-            strcpy(retPath, path);
-            return retPath;
-        } else
-        {
-            *size = length;
-            return NULL;
-        }
+			if (length < *size - 1)
+			{
+				*size = length;
+				strcpy(retPath, path);
+				return retPath;
+			}
+			else
+			{
+				*size = length;
+				return NULL;
+			}
+		}
+		else 
+		{
+			*size = 0;
+			return NULL;
+		}
     }
 };
 

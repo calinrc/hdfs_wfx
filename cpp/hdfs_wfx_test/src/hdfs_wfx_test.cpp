@@ -13,10 +13,10 @@
 #include <iostream>
 #include "wfxplugin.h"
 #include <string.h>
-#ifdef LINUX
-#include <dlfcn.h>
-#endif
+#include "gendef.h"
 #include <stdio.h>
+#include "Utilities.h"
+
 
 using namespace std;
 
@@ -29,6 +29,13 @@ typedef int (*FsFindClose_func)(HANDLE Hdl);
 
 HANDLE INVALID_HANDLE = (HANDLE) -1;
 
+#ifdef LINUX
+#define LIB_REL_PATH "/.config/doublecmd/plugins/hdfs_wfx/hdfs_wfx.wfx"
+#else
+#define LIB_REL_PATH "\\.config\\doublecmd\\plugins\\hdfs_wfx\\hdfs_wfx.wfx"
+#endif
+
+
 void printFileInfo(char* path, WIN32_FIND_DATAA* data)
 {
     printf("Informations about path %s:\n", path);
@@ -39,25 +46,22 @@ int main()
 {
     cout << "Begin" << endl; // prints !!!Hello World!!!
     char name[100];
+	char lib_path[MAX_PATH];
+	memset(lib_path, 0, sizeof(lib_path));
+	char* userHomeDir = Utilities::getUserHomeDir();
+	sprintf(lib_path, "%s%s", userHomeDir, LIB_REL_PATH);
+	delete[] userHomeDir;
 
-#ifdef LINUX
-    void* handle = dlopen("../hdfs_wfx/Debug/hdfs_wfx.wfx", RTLD_LAZY);
+	LIB_HANDLER handle = LOAD_LIB(lib_path, RTLD_LAZY);
 
-    FsGetDefRootName_func FsGetDefRootName = (FsGetDefRootName_func) dlsym(handle, "FsGetDefRootName");
-    FsInit_func FsInit = (FsInit_func) dlsym(handle, "FsInit");
-    FsSetDefaultParams_func FsSetDefaultParams = (FsSetDefaultParams_func) dlsym(handle, "FsSetDefaultParams");
-    FsFindFirst_func FsFindFirst = (FsFindFirst_func) dlsym(handle, "FsFindFirst");
-    FsFindNext_func FsFindNext = (FsFindNext_func) dlsym(handle, "FsFindNext");
-    FsFindClose_func FsFindClose = (FsFindClose_func) dlsym(handle, "FsFindClose");
-#else
-	FsGetDefRootName_func FsGetDefRootName = NULL;
-	FsInit_func FsInit = NULL;
-	FsSetDefaultParams_func FsSetDefaultParams = NULL;
-	FsFindFirst_func FsFindFirst = NULL;
-	FsFindNext_func FsFindNext = NULL;
-	FsFindClose_func FsFindClose = NULL;
-#endif 
-    FsGetDefRootName(name, 100);
+    FsGetDefRootName_func FsGetDefRootName = (FsGetDefRootName_func)LOAD_PROC(handle, "FsGetDefRootName");
+    FsInit_func FsInit = (FsInit_func)LOAD_PROC(handle, "FsInit");
+    FsSetDefaultParams_func FsSetDefaultParams = (FsSetDefaultParams_func)LOAD_PROC(handle, "FsSetDefaultParams");
+    FsFindFirst_func FsFindFirst = (FsFindFirst_func)LOAD_PROC(handle, "FsFindFirst");
+    FsFindNext_func FsFindNext = (FsFindNext_func)LOAD_PROC(handle, "FsFindNext");
+    FsFindClose_func FsFindClose = (FsFindClose_func)LOAD_PROC(handle, "FsFindClose");
+
+	FsGetDefRootName(name, 100);
 
     cout << "Plugin Name: " << name << endl;
 

@@ -14,12 +14,6 @@
 #include <jni.h>
 #include "Logger.h"
 #include <stdlib.h>
-#ifdef LINUX
-#include <dlfcn.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-#endif
 #include <string.h>
 #include "Utilities.h"
 #include <assert.h>
@@ -72,10 +66,10 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
 
         LOGGING("Using log4j.configuration param \"%s\"", log4jParam);
 
-        options[0].optionString = classpathParam; //(char*) "-Djava.class.path=/home/abs/.config/doublecmd/plugins/hdfs_wfx/java/wfx_launcher.jar";
+        options[0].optionString = classpathParam;
         options[0].extraInfo = 0;
 
-        options[1].optionString = log4jParam; //(char*) "-Dlog4j.configuration=file:///home/ae/.config/doublecmd/plugins/hdfs_wfx/log4j.xml";
+        options[1].optionString = log4jParam;
         options[1].extraInfo = 0;
 
         options[2].optionString = xms;
@@ -98,7 +92,7 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
         {
             char path[MAX_PATH] = { 0 };
 
-            sprintf(path, "%s/jre/lib/amd64/server/libjvm.so", javaHomeFolder);
+            sprintf(path, MAIN_JVM_PATH, javaHomeFolder);
 
             bool foundJvm = false;
 
@@ -107,7 +101,7 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
             if (stat(path, &st) == -1)
             {
                 LOGGING("Unable to find jvm dynamic library in %s", path);
-                sprintf(path, "%s/jre/lib/amd64/default/libjvm.so", javaHomeFolder);
+                sprintf(path, ALTERNATIVE_JVM_PATH, javaHomeFolder);
                 if (stat(path, &st) == -1)
                 {
                     LOGGING("Unable to find jvm dynamic library in %s", path);
@@ -121,18 +115,17 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
                 //found in default Oracle, OpenJDK places
                 foundJvm = true;
             }
-#ifdef LINUX
             if (foundJvm)
             {
                 LOGGING("Try loading JVM dynamic library...");
-                m_handle = dlopen(path, RTLD_LAZY);
+                m_handle = LOAD_LIB(path, RTLD_LAZY);
 
                 if (m_handle != NULL)
                 {
 
                     LOGGING("Try creating JVM");
                     JNI_CreateJavaVM_func JNI_CreateJavaVM_loc;
-                    JNI_CreateJavaVM_loc = (JNI_CreateJavaVM_func) dlsym(m_handle, "JNI_CreateJavaVM");
+                    JNI_CreateJavaVM_loc = (JNI_CreateJavaVM_func)LOAD_PROC(m_handle, "JNI_CreateJavaVM");
 
                     JNIEnv* env;
                     jint jvmCreateState = JNI_CreateJavaVM_loc(&m_jvm, (void**) &env, &vm_args);
@@ -147,12 +140,14 @@ JVMStateEnum JVMState::initialize(const char* javaLauncherJar)
                     retVal = JVMLoaded;
                 } else
                 {
+#ifdef LINUX
                     LOGGING("JVM loading error %s", dlerror());
+#else
+					LOGGING("JVM loading error");
+#endif
                     assert(false);
                 }
             }
-#endif
-
         } else
         {
             LOGGING("Unable to find JAVA_HOME variable");
@@ -221,9 +216,7 @@ JVMStateEnum JVMState::detach()
     }
     if (m_handle != NULL)
     {
-#ifdef LINUX
-        dlclose(m_handle);
-#endif
+        FREE_LIB(m_handle);
         m_handle = NULL;
     }
     m_initialized = false;

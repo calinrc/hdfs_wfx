@@ -28,6 +28,33 @@
 #define PATH_SEPARATOR ":"
 #define FILE_SEPARATOR "/"
 
+#ifdef LINUX
+
+#include <dlfcn.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+#define LIB_HANDLER void* 
+#define LOAD_LIB(__PATH__, __PARAMS__) dlopen(__PATH__, __PARAMS__)
+#define LOAD_PROC dlsym
+#define FREE_LIB dlclose
+#define MAIN_JVM_PATH "%s/jre/lib/amd64/server/libjvm.so"
+#define ALTERNATIVE_JVM_PATH "%s/jre/lib/amd64/default/libjvm.so"
+
+#else
+
+#include <windows.h>
+#define LIB_HANDLER HINSTANCE 
+#define LOAD_LIB(__PATH__, __PARAMS__) LoadLibrary(__PATH__)
+#define LOAD_PROC GetProcAddress
+#define FREE_LIB FreeLibrary
+#define MAIN_JVM_PATH "%s\\jre\\bin\\default\\jvm.dll"
+#define ALTERNATIVE_JVM_PATH "%s\\jre\\bin\\server\\jvm.dll"
+
+
+
+#endif
+
 #define MAX_PATH 260
 
 enum JVMStateEnum
