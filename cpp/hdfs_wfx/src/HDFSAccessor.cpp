@@ -31,6 +31,7 @@ jmethodID HDFSAccessor::s_WfxPairMetIdRenPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdCopyPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdGetPath = NULL;
 jmethodID HDFSAccessor::s_WfxPairMetIdPutPath = NULL;
+jmethodID HDFSAccessor::s_WfxPairMetIdfileExists = NULL;
 
 jmethodID HDFSAccessor::s_NativeProgressConstructor = NULL;
 
@@ -109,7 +110,11 @@ int HDFSAccessor::initialize()
 
             s_WfxPairMetIdPutPath = env->GetMethodID(wfxPairClass, "putFile",
                                                      "(Ljava/lang/String;Ljava/lang/String;ZLorg/cgc/wfx/Progress;)V");
+
             assert(s_WfxPairMetIdPutPath != NULL);
+
+            s_WfxPairMetIdfileExists = env->GetMethodID(wfxPairClass, "fileExists", "(Ljava/lang/String;)Z");
+            assert(s_WfxPairMetIdfileExists != NULL);
 
             initFileEnumerator(env);
 
@@ -455,3 +460,31 @@ bool HDFSAccessor::putFile(char* localPath, char* remotePath, bool overwrite, Pr
     }
     return false;
 }
+
+bool HDFSAccessor::hdfsPathExist(char* remotePath)
+{
+    bool retVal = false;
+    bool isNewEnv = false;
+    JNIEnv* env = JVMState::instance()->getEnv(&isNewEnv);
+    if (m_wfxPairObj != NULL)
+    {
+        jstring remotePathStr = env->NewStringUTF(remotePath);
+        jboolean fileExists = env->CallBooleanMethod(m_wfxPairObj, s_WfxPairMetIdfileExists, remotePathStr);
+        if (!JVMState::instance()->exceptionExists(env))
+        {
+            retVal = fileExists;
+            env->DeleteLocalRef(remotePathStr);
+            if (isNewEnv)
+            {
+                JVMState::instance()->releaseEnv();
+            }
+            return true;
+        } else
+        {
+            env->DeleteLocalRef(remotePathStr);
+        }
+    }
+    return retVal;
+
+}
+

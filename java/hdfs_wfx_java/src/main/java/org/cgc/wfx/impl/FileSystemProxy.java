@@ -249,4 +249,19 @@ public class FileSystemProxy implements WfxPair {
 		}
 	}
 
+	@Override
+	public boolean fileExists(String remotePath) {
+		log.debug("Check  path " + remotePath + " existance");
+		Path fRemotePath = new Path(remotePath);
+		try {
+			boolean retval = this.fileSystem.exists(fRemotePath);
+			log.debug("Path " + remotePath
+					+ (retval ? " exists " : " not exists"));
+			return retval;
+		} catch (IOException ioEx) {
+			log.error("FAIL on cheking path existance" + fRemotePath, ioEx);
+			throw new WfxHdfsException(ioEx);
+		}
+	}
+
 }

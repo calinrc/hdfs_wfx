@@ -40,24 +40,24 @@ HANDLE INVALID_HANDLE = (HANDLE) -1;
 tProgressProc gProgressProc;
 tRequestProc gRequestProc;
 int gPluginNo;
-
-char logPath[MAX_PATH];
-size_t pathSize = MAX_PATH;
+bool resume = false;
 
 int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
     gProgressProc = pProgressProc;
     gRequestProc = pRequestProc;
     gPluginNo = PluginNr;
+    if (!HDFSAccessor::instance()->isInitialized())
+    {
 #ifdef HDFS_WFX_DEBUG
-    Logger::getInstance()->init(true, true, pLogProc, PluginNr);
+        Logger::getInstance()->init(true, true, pLogProc, PluginNr);
 #else
-    Logger::getInstance()->init(true, false, pLogProc, PluginNr);
+        Logger::getInstance()->init(true, false, pLogProc, PluginNr);
 #endif
-    LOGGING("FSInit");
+        LOGGING("FSInit");
 
-    char javaLauncherPath[MAX_PATH];
-    size_t pathSize = MAX_PATH;
+        char javaLauncherPath[MAX_PATH];
+        size_t pathSize = MAX_PATH;
 //    if (pRequestProc != NULL)
 //    {
 //        char returnedText[100];
@@ -65,10 +65,10 @@ int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc,
 //        BOOL rv = pRequestProc(PluginNr, 3, "CustomTitle", "CustomText", returnedText, 100);
 //        LOGGING("requestProc val %d, message %s", rv, returnedText);
 //    }
-    JVMState::instance()->initialize(Utilities::getJavaLauncherPath(javaLauncherPath, &pathSize));
-    int initialized = HDFSAccessor::instance()->initialize();
-    LOGGING("HDFSAccesstor initialization done %d", initialized);
-
+        JVMState::instance()->initialize(Utilities::getJavaLauncherPath(javaLauncherPath, &pathSize));
+        int initialized = HDFSAccessor::instance()->initialize();
+        LOGGING("HDFSAccesstor initialization done %d", initialized);
+    }
     return 0;
 }
 
@@ -154,10 +154,25 @@ int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
     LOGGING("FsPutFile Local path %s in HDFS path %s with flags %d", LocalName, RemoteName, CopyFlags);
-    ProgressInfo* progressInfo = new ProgressInfo(LocalName, RemoteName, gProgressProc, gPluginNo);
-    bool success = HDFSAccessor::instance()->putFile(LocalName, RemoteName, true, progressInfo);
-    delete progressInfo;
-    return success ? FS_FILE_OK : FS_FILE_WRITEERROR;
+    if (!resume)
+    {
+        resume = true;
+
+    }
+
+    if (CopyFlags == 0)
+    {
+        if (HDFSAccessor::instance()->hdfsPathExist(RemoteName))
+        {
+            return FS_FILE_EXISTSRESUMEALLOWED;
+        }
+    } else
+    {
+        ProgressInfo* progressInfo = new ProgressInfo(LocalName, RemoteName, gProgressProc, gPluginNo);
+        bool success = HDFSAccessor::instance()->putFile(LocalName, RemoteName, true, progressInfo);
+        delete progressInfo;
+        return success ? FS_FILE_OK : FS_FILE_WRITEERROR;
+    }
 }
 
 int FsExecuteFile(HWND MainWin, char* RemoteName, char* Verb)
@@ -188,7 +203,8 @@ BOOL FsDisconnect(char *DisconnectRoot)
 
 void FsSetDefaultParams(FsDefaultParamStruct* dps)
 {
-    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi, dps->PluginInterfaceVersionLow, dps->size);
+    LOGGING("FsSetDefaultParams %s version %d:%d size %d", dps->DefaultIniName, dps->PluginInterfaceVersionHi,
+            dps->PluginInterfaceVersionLow, dps->size);
 }
 
 void FsGetDefRootName(char* DefRootName, int maxlen)

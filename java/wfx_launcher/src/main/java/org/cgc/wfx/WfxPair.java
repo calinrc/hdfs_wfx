@@ -69,5 +69,11 @@ public interface WfxPair {
 	 * @return boolean
 	 */
 	void putFile(String localPath, String remotePath, boolean overwrite, Progress progress);
+	
+	/**
+	 * @param repotePath
+	 * @return boolean
+	 */
+	boolean fileExists(String repotePath);
 
 }

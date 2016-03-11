@@ -28,6 +28,10 @@ public:
     }
 
     int initialize();
+    bool isInitialized()
+    {
+        return m_initialized;
+    }
     void release();
 
     FileEnumerator* getFolderContent(char* path);
@@ -44,6 +48,7 @@ public:
 
     bool putFile(char* localPath, char* remotePath, bool overwrite, ProgressInfo* progressInfo);
 
+    bool hdfsPathExist(char* remotePath);
 
 private:
     HDFSAccessor();
@@ -67,6 +72,7 @@ public:
     static jmethodID s_WfxPairMetIdCopyPath;
     static jmethodID s_WfxPairMetIdGetPath;
     static jmethodID s_WfxPairMetIdPutPath;
+    static jmethodID s_WfxPairMetIdfileExists;
 
     static jmethodID s_NativeProgressConstructor;
 
