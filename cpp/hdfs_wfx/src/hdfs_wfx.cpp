@@ -40,7 +40,6 @@ HANDLE INVALID_HANDLE = (HANDLE) -1;
 tProgressProc gProgressProc;
 tRequestProc gRequestProc;
 int gPluginNo;
-bool resume = false;
 
 int DCPCALL FsInit(int PluginNr, tProgressProc pProgressProc, tLogProc pLogProc, tRequestProc pRequestProc)
 {
@@ -154,18 +153,9 @@ int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)
 {
     LOGGING("FsPutFile Local path %s in HDFS path %s with flags %d", LocalName, RemoteName, CopyFlags);
-    if (!resume)
+    if (CopyFlags == 0 && HDFSAccessor::instance()->hdfsPathExist(RemoteName))
     {
-        resume = true;
-
-    }
-
-    if (CopyFlags == 0)
-    {
-        if (HDFSAccessor::instance()->hdfsPathExist(RemoteName))
-        {
-            return FS_FILE_EXISTSRESUMEALLOWED;
-        }
+        return FS_FILE_EXISTSRESUMEALLOWED;
     } else
     {
         ProgressInfo* progressInfo = new ProgressInfo(LocalName, RemoteName, gProgressProc, gPluginNo);

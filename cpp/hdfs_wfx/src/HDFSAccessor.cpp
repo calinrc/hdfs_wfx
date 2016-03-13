@@ -478,7 +478,6 @@ bool HDFSAccessor::hdfsPathExist(char* remotePath)
             {
                 JVMState::instance()->releaseEnv();
             }
-            return true;
         } else
         {
             env->DeleteLocalRef(remotePathStr);
