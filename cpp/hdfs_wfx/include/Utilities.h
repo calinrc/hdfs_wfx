@@ -22,7 +22,6 @@
 #include <Shlobj.h>
 #endif
 #include "gendef.h"
-#include <sys/stat.h>
 #include <string.h>
 
 

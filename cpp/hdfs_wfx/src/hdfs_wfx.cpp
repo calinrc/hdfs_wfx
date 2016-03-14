@@ -142,12 +142,17 @@ int FsRenMovFile(char* OldName, char* NewName, BOOL Move, BOOL OverWrite, Remote
 int FsGetFile(char* RemoteName, char* LocalName, int CopyFlags, RemoteInfoStruct* ri)
 {
     LOGGING("FsGetFile from %s to %s wiht copy flags %d", RemoteName, LocalName, CopyFlags);
-    ProgressInfo* progressInfo = new ProgressInfo(RemoteName, LocalName, gProgressProc, gPluginNo);
-    bool success = HDFSAccessor::instance()->getFile(RemoteName, LocalName, progressInfo);
-    delete progressInfo;
-    return success ? FS_FILE_OK : FS_FILE_READERROR;
-
-    //FS_FILE_READERROR, FS_FILE_USERABORT, FS_FILE_NOTFOUND, FS_FILE_NOTSUPPORTED
+    struct stat st = { 0 };
+    if (CopyFlags == 0 && stat(LocalName, &st) == 0)
+    {
+        return FS_FILE_EXISTSRESUMEALLOWED;
+    } else
+    {
+        ProgressInfo* progressInfo = new ProgressInfo(RemoteName, LocalName, gProgressProc, gPluginNo);
+        bool success = HDFSAccessor::instance()->getFile(RemoteName, LocalName, progressInfo);
+        delete progressInfo;
+        return success ? FS_FILE_OK : FS_FILE_READERROR;
+    }
 }
 
 int FsPutFile(char* LocalName, char* RemoteName, int CopyFlags)

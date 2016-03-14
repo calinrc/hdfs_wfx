@@ -15,7 +15,7 @@
 #include <string.h>
 #include "JVMState.h"
 #include "common.h"
-#include <sys/stat.h>
+#include "gendef.h"
 #include "Logger.h"
 
 FileEnumerator::FileEnumerator(jobject wfxPairObj, string& parentPath, set<string>& content) :
