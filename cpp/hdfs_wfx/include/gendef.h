@@ -16,7 +16,7 @@
 #include <HdfsWfxVersion.h>
 #include <stddef.h>
 
-#define PLUGINS_LOCATION ".config/doublecmd/plugins"
+#define PLUGINS_LOCATION ".config"
 
 #define PLUGIN_LOCATION PLUGINS_LOCATION "/hdfs_wfx"
 #define LOG_PATH PLUGIN_LOCATION "/logs"

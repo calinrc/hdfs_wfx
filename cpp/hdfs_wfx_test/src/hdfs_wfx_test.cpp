@@ -30,9 +30,9 @@ typedef int (*FsFindClose_func)(HANDLE Hdl);
 HANDLE INVALID_HANDLE = (HANDLE) -1;
 
 #ifdef LINUX
-#define LIB_REL_PATH "/.config/doublecmd/plugins/hdfs_wfx/hdfs_wfx.wfx"
+#define LIB_REL_PATH "/.config/hdfs_wfx/hdfs_wfx.wfx"
 #else
-#define LIB_REL_PATH "\\.config\\doublecmd\\plugins\\hdfs_wfx\\hdfs_wfx.wfx"
+#define LIB_REL_PATH "\\.config\\hdfs_wfx\\hdfs_wfx.wfx"
 #endif
 
 

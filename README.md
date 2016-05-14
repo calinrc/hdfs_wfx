@@ -38,7 +38,7 @@ Installation:
 Option 1:
 	From unzip location run $> ant -f install.xml
 Option 2
-	Copy "plugins" folder from archive on $HOME/.config/doublecmd
+	Copy "plugins" folder from archive on $HOME/.config/hdfs_wfx
 
 	
 3) In Double Commander menu go to Configuration -> Options -> Plugins -> File System Plugins (.wfx) -> Add -> OK

@@ -8,7 +8,7 @@
     <param name="MaxBackupIndex" value="10" />
     <param name="MaxFileSize" value="100MB" />
     <param name="Threshold" value="INFO" />
-    <param name="File" value="${user.home}/.config/doublecmd/plugins/hdfs_wfx/logs/hdfs_wfx_java_trace.log" />
+    <param name="File" value="${user.home}/.config/hdfs_wfx/logs/hdfs_wfx_java_trace.log" />
     <layout class="org.apache.log4j.EnhancedPatternLayout">
         <!-- Add %throwable{short} if you want to suppress stack trace -->
         <param name="ConversionPattern" value="%d{ISO8601}  [%p] [%t] [%C] %m%n" />

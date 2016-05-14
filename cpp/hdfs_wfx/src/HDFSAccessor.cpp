@@ -130,7 +130,7 @@ int HDFSAccessor::initialize()
                 }
             } else
             {
-                LOGGING("Fail on obtaining WfxPair instance. Please check the existence of hdfs_wfx.jar inside of ~/.config/doublecmd/plugins/hdfs_wfx/java/deps/ folder")
+                LOGGING("Fail on obtaining WfxPair instance. Please check the existence of hdfs_wfx.jar inside of ~/.config/hdfs_wfx/java/deps/ folder")
                 assert(false);
             }
             env->DeleteLocalRef(depsPathStr);

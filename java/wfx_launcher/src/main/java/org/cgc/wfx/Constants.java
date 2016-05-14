@@ -14,7 +14,7 @@ package org.cgc.wfx;
 
 public interface Constants {
 
-	String DEPENDENCIES_PATH = ".config/doublecmd/plugins/hdfs_wfx/java/deps";
-	String HDFS_WFX_NATIVE_LIBRARY = ".config/doublecmd/plugins/hdfs_wfx/hdfs_wfx.wfx";
+	String DEPENDENCIES_PATH = ".config/hdfs_wfx/java/deps";
+	String HDFS_WFX_NATIVE_LIBRARY = ".config/hdfs_wfx/hdfs_wfx.wfx";
 	
 }

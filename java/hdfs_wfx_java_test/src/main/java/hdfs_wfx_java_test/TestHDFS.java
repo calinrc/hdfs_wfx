@@ -54,7 +54,7 @@ public class TestHDFS {
 			pair.renamePath("/user/folderToRename", "/user/folderToRenameChanged_" + System.currentTimeMillis());
 
 			pair.mkDir("/user/upload");
-			pair.putFile(homePath + File.separatorChar + ".config/doublecmd/plugins/hdfs_wfx/java/log4j.xml",
+			pair.putFile(homePath + File.separatorChar + ".config/hdfs_wfx/java/log4j.xml",
 					"/user/upload/log4j.xml", true, null);
 
 			pair.getFile("/user/upload/log4j.xml", new File(".").getAbsolutePath() + File.separatorChar + ".cucu", null);

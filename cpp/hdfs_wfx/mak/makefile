@@ -67,7 +67,7 @@ clean:
 	-@echo ' '
 
 post-build:
-	-cp -f hdfs_wfx.wfx ${HOME}/.config/doublecmd/plugins/hdfs_wfx/
+	-cp -f hdfs_wfx.wfx ${HOME}/.config/hdfs_wfx/
 	-@echo ' '
 
 .PHONY: all clean dependents

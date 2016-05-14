@@ -97,7 +97,7 @@
       <ModuleDefinitionFile>.\hdfs_wfx.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>set FINAL_LOC=%HOMEPATH%\.config\doublecmd\plugins\hdfs_wfx
+      <Command>set FINAL_LOC=%HOMEPATH%\.config\hdfs_wfx
 mkdir %FINAL_LOC%
 copy /y $(TargetPath) %FINAL_LOC%</Command>
     </PostBuildEvent>
@@ -117,7 +117,7 @@ copy /y $(TargetPath) %FINAL_LOC%</Command>
       <ModuleDefinitionFile>.\hdfs_wfx.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>set FINAL_LOC=%HOMEPATH%\.config\doublecmd\plugins\hdfs_wfx
+      <Command>set FINAL_LOC=%HOMEPATH%\.config\hdfs_wfx
 mkdir %FINAL_LOC%
 copy /y $(TargetPath) %FINAL_LOC%</Command>
     </PostBuildEvent>
@@ -140,7 +140,7 @@ copy /y $(TargetPath) %FINAL_LOC%</Command>
       <ModuleDefinitionFile>.\hdfs_wfx.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>set FINAL_LOC=%HOMEPATH%\.config\doublecmd\plugins\hdfs_wfx
+      <Command>set FINAL_LOC=%HOMEPATH%\.config\hdfs_wfx
 mkdir %FINAL_LOC%
 copy /y $(TargetPath) %FINAL_LOC%</Command>
     </PostBuildEvent>
@@ -163,7 +163,7 @@ copy /y $(TargetPath) %FINAL_LOC%</Command>
       <ModuleDefinitionFile>.\hdfs_wfx.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>set FINAL_LOC=%HOMEPATH%\.config\doublecmd\plugins\hdfs_wfx
+      <Command>set FINAL_LOC=%HOMEPATH%\.config\hdfs_wfx
 mkdir %FINAL_LOC%
 copy /y $(TargetPath) %FINAL_LOC%</Command>
     </PostBuildEvent>
